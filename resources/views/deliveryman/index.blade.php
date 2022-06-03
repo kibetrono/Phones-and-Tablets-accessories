@@ -4,17 +4,8 @@
 @endphp
 @push('script-page')
     <script>
-        $(document).on('click', '#billing_data', function () {
-            $("[name='shipping_name']").val($("[name='billing_name']").val());
-            $("[name='shipping_country']").val($("[name='billing_country']").val());
-            $("[name='shipping_state']").val($("[name='billing_state']").val());
-            $("[name='shipping_city']").val($("[name='billing_city']").val());
-            $("[name='shipping_phone']").val($("[name='billing_phone']").val());
-            $("[name='shipping_zip']").val($("[name='billing_zip']").val());
-            $("[name='shipping_address']").val($("[name='billing_address']").val());
-        })
+        </script>
 
-    </script>
 @endpush
 @section('page-title')
     {{__('Manage Delivery Personel')}}
@@ -60,6 +51,7 @@
                                     <th>{{__('Action')}}</th>
                                 </tr>
                             </thead>
+                            
                             <tbody>
                            
                                 @foreach ($deliverypersons as $k=>$del_man)

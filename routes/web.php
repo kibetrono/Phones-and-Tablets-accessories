@@ -476,13 +476,6 @@ Route::resource('productstock', 'ProductStockController')->middleware(
     ]
 );
 
-// Delivery Man
-// Route::resource('deliveryman', 'DeliveryManController')->middleware(
-//     [
-//         'auth',
-//         'XSS','revalidate',
-//     ]
-// );
 
 
 // new delivery man resource
@@ -496,8 +489,8 @@ Route::group(
 
     Route::get('deliveryman/{id}/show', 'DeliveryManController@show')->name('deliveryman.show');
     Route::ANY('deliveryman/{id}/statement', 'DeliveryManController@statement')->name('deliveryman.statement');
-    Route::any('deliveryman-reset-password/{id}', 'DeliveryManController@customerPassword')->name('deliveryman.reset');
-    Route::post('deliveryman-reset-password/{id}', 'DeliveryManController@customerPasswordReset')->name('deliveryman.password.update');
+    Route::any('deliveryman-reset-password/{id}', 'DeliveryManController@deliveryPersonPassword')->name('deliveryman.reset');
+    Route::post('deliveryman-reset-password/{id}', 'DeliveryManController@deliveryPersonPasswordReset')->name('deliveryman.password.update');
     
     Route::resource('deliveryman', 'DeliveryManController');
 

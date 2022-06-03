@@ -201,7 +201,7 @@
                     <li class="dash-item {{ (Request::segment(1) == 'deliveryman')?'active':''}}">
                         <a href="{{ route('deliveryman.index') }}" class="dash-link ">
                             <span class="dash-micon"><i class="ti ti-user"></i></span>
-                            <span class="dash-mtext">{{__('DeliveryMan')}}</span>
+                            <span class="dash-mtext">{{__('Delivery Person')}}</span>
                         </a>
                     </li>
                 @endif

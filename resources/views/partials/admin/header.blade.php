@@ -78,6 +78,9 @@
                                 @if(Gate::check('create vender'))
                                     <a class="dropdown-item" href="#" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}"><i class="ti ti-note"></i>{{__('Create New Vendor')}}</a>
                                 @endif
+                                @if(Gate::check('create customer'))
+                                <a class="dropdown-item" href="#" data-url="{{ route('deliveryman.create') }}" data-ajax-popup="true" data-title="{{__('Create New Delivery Person')}}"><i class="ti ti-note"></i>{{__('Create New Delivery Person')}}</a>
+                            @endif
                                 @if(Gate::check('create proposal'))
                                     <a class="dropdown-item" href="{{ route('proposal.create',0) }}"><i class="ti ti-file"></i>{{__('Create New Proposal')}}</a>
                                 @endif

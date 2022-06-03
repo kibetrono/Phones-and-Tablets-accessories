@@ -103,21 +103,6 @@ class DeliveryManController extends Controller
                     'tax_number' => $request->tax_number,
                     'password' => Hash::make($request->password),
                     'created_by' => \Auth::user()->creatorId(),
-                    'billing_name' => $request->billing_name,
-                    'billing_country' => $request->billing_country,
-                    'billing_state' => $request->billing_state,
-                    'billing_city' => $request->billing_city,
-                    'billing_phone' => $request->billing_phone,
-                    'billing_zip' => $request->billing_zip,
-                    'billing_address' => $request->billing_address,
-
-                    'shipping_name' => $request->shipping_name,
-                    'shipping_country' => $request->shipping_country,
-                    'shipping_state' => $request->shipping_state,
-                    'shipping_city' => $request->shipping_city,
-                    'shipping_phone' => $request->shipping_phone,
-                    'shipping_zip' => $request->shipping_zip,
-                    'shipping_address' => $request->shipping_address,
                     'lang' => !empty($default_language) ? $default_language->value : '',
 
                 ]);
@@ -131,22 +116,7 @@ class DeliveryManController extends Controller
                 // $customer->tax_number      =$request->tax_number;
                 // $customer->password        = Hash::make($request->password);
                 // $customer->created_by      = \Auth::user()->creatorId();
-                // $customer->billing_name    = $request->billing_name;
-                // $customer->billing_country = $request->billing_country;
-                // $customer->billing_state   = $request->billing_state;
-                // $customer->billing_city    = $request->billing_city;
-                // $customer->billing_phone   = $request->billing_phone;
-                // $customer->billing_zip     = $request->billing_zip;
-                // $customer->billing_address = $request->billing_address;
-
-                // $customer->shipping_name    = $request->shipping_name;
-                // $customer->shipping_country = $request->shipping_country;
-                // $customer->shipping_state   = $request->shipping_state;
-                // $customer->shipping_city    = $request->shipping_city;
-                // $customer->shipping_phone   = $request->shipping_phone;
-                // $customer->shipping_zip     = $request->shipping_zip;
-                // $customer->shipping_address = $request->shipping_address;
-
+                
                 // $customer->lang = !empty($default_language) ? $default_language->value : '';
 
                 // $customer->save();
@@ -201,9 +171,11 @@ class DeliveryManController extends Controller
      */
     public function show($ids)
     {
+        
         $id       = \Crypt::decrypt($ids);
-        $deliverman = DeliveryMan::find($id);
-        return view('deliveryman.show', compact('deliverman'));
+        $deliveryperson = DeliveryMan::find($id);
+        // dd($deliveryperson);
+        return view('deliveryman.show', compact('deliveryperson'));
     }
 
     /**
@@ -212,9 +184,19 @@ class DeliveryManController extends Controller
      * @param  \App\Models\DeliveryMan  $deliveryMan
      * @return \Illuminate\Http\Response
      */
-    public function edit(DeliveryMan $deliveryMan)
+    public function edit($id)
     {
-        //
+        if (\Auth::user()->can('edit customer')) {
+            $deliveryperson              = DeliveryMan::find($id);
+            $deliveryperson->customField = CustomField::getData($deliveryperson, 'customer');
+
+            $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'customer')->get();
+
+            return view('deliveryman.edit', compact('deliveryperson', 'customFields'));
+        } else {
+
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
 
     /**
@@ -224,9 +206,41 @@ class DeliveryManController extends Controller
      * @param  \App\Models\DeliveryMan  $deliveryMan
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, DeliveryMan $deliveryMan)
+    public function update(Request $request, $id)
     {
-        //
+
+        // dd($request);
+
+        if (\Auth::user()->can('edit customer')) {
+            $deliveryMan = DeliveryMan::find($id);
+
+            $rules = [
+                'name' => 'required',
+                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+            ];
+
+
+            $validator = \Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                $messages = $validator->getMessageBag();
+
+                return redirect()->route('deliveryman.index')->with('error', $messages->first());
+            }
+
+            $deliveryMan->name             = $request->name;
+            $deliveryMan->contact          = $request->contact;
+            $deliveryMan->email            = $request->email;
+            $deliveryMan->tax_number        =$request->tax_number;
+            $deliveryMan->created_by       = \Auth::user()->creatorId();
+           
+            $deliveryMan->save();
+
+            CustomField::saveData($deliveryMan, $request->customField);
+
+            return redirect()->route('deliveryman.index')->with('success', __('Delivery person successfully updated.'));
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
 
     /**
@@ -235,8 +249,62 @@ class DeliveryManController extends Controller
      * @param  \App\Models\DeliveryMan  $deliveryMan
      * @return \Illuminate\Http\Response
      */
-    public function destroy(DeliveryMan $deliveryMan)
+    public function destroy($id)
     {
-        //
+        if (\Auth::user()->can('delete customer')) {
+            $deliveryMan = DeliveryMan::find($id);
+
+            if ($deliveryMan->created_by == \Auth::user()->creatorId()) {
+                
+                $deliveryMan->delete();
+
+                return redirect()->route('deliveryman.index')->with('success', __('Delivery person successfully deleted.'));
+            } else {
+                return redirect()->back()->with('error', __('Permission denied.'));
+            }
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function deliveryPersonPassword($id)
+    {
+        $eId        = \Crypt::decrypt($id);
+        $deliveryman = DeliveryMan::find($eId);
+
+        return view('deliveryman.reset', compact('deliveryman'));
+
+    }
+
+    public function deliveryPersonPasswordReset(Request $request, $id)
+    {
+
+        dd($request->all());
+
+        $validator = \Validator::make(
+            $request->all(), [
+                               'password' => 'required|confirmed|same:password_confirmation',
+                           ]
+        );
+
+        if($validator->fails())
+        {
+            $messages = $validator->getMessageBag();
+
+            return redirect()->back()->with('error', $messages->first());
+        }
+
+
+        $user                 = User::where('id', $id)->first();
+
+        $user->forceFill([
+                             'password' => Hash::make($request->password),
+                         ])->save();
+
+        return redirect()->route('deliveryman.index')->with(
+            'success', 'User Password successfully updated.'
+        );
+
+
     }
 }

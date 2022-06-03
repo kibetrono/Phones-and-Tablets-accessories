@@ -62,47 +62,56 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body table-border-style">
-                    <h5></h5>
                     <div class="table-responsive">
                         <table class="table datatable">
                             <thead>
-                            <tr>
-                                <th>{{__('ID')}}</th>
-                                <th>{{__('Phone Model')}}</th>
-                                <th>{{__('Quantity Delivered')}}</th>
-                                <th>{{__('Recommended Retail Price')}}</th>
-                                <th>{{__('Action')}}</th>
+                            <tr role="row">
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('IMEI No.') }}</th>
+                                <th>{{ __('Serial No.') }}</th>
+                                <th>{{ __('Sale Price') }}</th>
+                                <th>{{ __('Recommended Retail Price') }}</th>
+                                <th>{{ __('Invoice No.') }}</th>
+                                 <th>{{ __('Action') }}</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            @foreach ($productIntakes as $productIntake)
-                                <tr class="font-style">
-                                    <td>{{ $productIntake->id}}</td>
-                                    <td>{{ $productIntake->model_name}}</td>
-                                    <td>{{ $productIntake->quantity_number }}</td>
-                                    <td>{{ $productIntake->retail_price }}</td>
 
-                                    @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
+                            <tbody>
+                            @foreach ($productServices as $productService)
+                                <tr class="font-style">
+                                    <td>{{ $productService->model_name }}</td>
+                                    <td>{{ $productService->imei_number }}</td>
+                                    <td>{{ $productService->serial_number }}</td>
+                                    <td>{{ $productService->sale_price }}</td>
+                                    <td>{{ $productService->retail_price }}</td>
+                                    <td>{{ $productService->invoice_number }}</td>
+ 
+                                    {{-- <a data-size="md" href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('productstock.edit', $productService->id) }}" data-ajax-popup="true"  data-size="xl" data-bs-toggle="tooltip" title="{{__('Update Quantity')}}">
+                                        <i class="ti ti-plus text-white"></i>
+                                    </a> --}}
+
                                     <td class="Action">
-                                        @can('edit product & service')
-                                            <div class="action-btn bg-primary ms-2">
-                                                <a href="#" class="mx-3 btn btn-sm align-items-center" data-url="{{ route('productintake.edit',$productService->id) }}" data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip" title="{{__('Edit')}}" data-title="{{__('Edit Product')}}">
-                                                    <i class="ti ti-pencil text-white"></i>
-                                                </a>
-                                            </div>
-                                        @endcan
-                                        @can('delete product & service')
-                                            <div class="action-btn bg-danger ms-2">
-                                                {!! Form::open(['method' => 'DELETE', 'route' => ['productintake.destroy', $productService->id],'id'=>'delete-form-'.$productService->id]) !!}
-                                                <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"><i class="ti ti-trash text-white text-white"></i></a>
-                                                {!! Form::close() !!}
-                                            </div>
-                                        @endcan
+                                  
+
+                                    @can('edit customer')
+                                        <div class="action-btn bg-primary ms-2">
+                                            <a data-size="md" href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('productintake.edit', $productService->id) }}" data-ajax-popup="true"  data-size="xl" data-bs-toggle="tooltip" title="{{__('Update')}}">
+                                                <i class="ti ti-pencil text-white"></i>
+                                            </a>
+                                        </div>
+                                     @endcan
+
+                                    @can('delete customer')
+                                    <div class="action-btn bg-danger ms-2">
+                                        {!! Form::open(['method' => 'DELETE', 'route' => ['productintake.destroy', $productService['id']],'id'=>'delete-form-'.$productService['id']]) !!}
+                                        <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" ><i class="ti ti-trash text-white text-white"></i></a>
+                                        {!! Form::close() !!}
+                                    </div>
+                                @endcan
+
                                     </td>
-                                @endif
                                 </tr>
                             @endforeach
-
                             </tbody>
                         </table>
                     </div>

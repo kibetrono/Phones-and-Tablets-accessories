@@ -17,6 +17,7 @@ class CreateDeliveryMenTable extends Migration
             $table->bigIncrements('id');
             $table->integer('deliveryman_id');
             $table->string('name');
+            $table->string('tax_number');
             $table->string('email')->unique();
             $table->string('password');
             $table->string('contact')->nullable();
@@ -24,20 +25,6 @@ class CreateDeliveryMenTable extends Migration
             $table->integer('created_by')->default(0);
             $table->integer('is_active')->default(1);
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('billing_name');
-            $table->string('billing_country');
-            $table->string('billing_state');
-            $table->string('billing_city');
-            $table->string('billing_phone');
-            $table->string('billing_zip');
-            $table->text('billing_address');
-            $table->string('shipping_name');
-            $table->string('shipping_country');
-            $table->string('shipping_state');
-            $table->string('shipping_city');
-            $table->string('shipping_phone');
-            $table->string('shipping_zip');
-            $table->text('shipping_address');
             $table->string('lang')->default('en');
             $table->rememberToken();
             $table->timestamps();

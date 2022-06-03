@@ -24,7 +24,7 @@ class ProductIntakeController extends Controller
         if (\Auth::user()->can('manage product & service'))
         {
             $productServices = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
-            return view('productIntake2.index', compact('productServices'));
+            return view('productIntake.index', compact('productServices'));
         }
         else
         {
@@ -44,7 +44,7 @@ class ProductIntakeController extends Controller
 
             $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
     // dd($product_model_name);
-            return view('productIntake2.create', compact('product_model_name', 'customFields'));
+            return view('productIntake.create', compact('product_model_name', 'customFields'));
         }
         else
         {
@@ -64,13 +64,11 @@ class ProductIntakeController extends Controller
 
             $rules = [
                 'model_name' => 'required',
-                'sku' => 'required',
                 'imei_number' =>'required',
                 'serial_number' =>'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
-                'type' => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -83,13 +81,11 @@ class ProductIntakeController extends Controller
             $productIntake                  = new ProductIntake();
 
             $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
-            $productIntake->sku             = $request->sku;
             $productIntake->imei_number     = $request->imei_number;
             $productIntake->serial_number   = $request->serial_number;
             $productIntake->sale_price      = $request->sale_price;
             $productIntake->retail_price    = $request->retail_price;
             $productIntake->invoice_number  = $request->invoice_number;
-            $productIntake->type            = $request->type;
             $productIntake->created_by      = \Auth::user()->creatorId();
             $productIntake->save();
             CustomField::saveData($productIntake, $request->customField);
@@ -128,7 +124,7 @@ class ProductIntakeController extends Controller
             {
                 $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
 
-                return view('productIntake2.edit', compact( 'product_model_name','productIntake'));
+                return view('productIntake.edit', compact( 'product_model_name','productIntake'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
@@ -152,13 +148,11 @@ class ProductIntakeController extends Controller
             $productIntake = ProductIntake::find($id);
             $rules = [
                 'model_name' => 'required',
-                'sku' => 'required',
                 'imei_number' =>'required',
                 'serial_number' =>'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
-                'type' => 'required',
             ];
             $validator = \Validator::make($request->all(), $rules);
 
@@ -168,13 +162,11 @@ class ProductIntakeController extends Controller
                 return redirect()->route('productintake.index')->with('error', $messages->first());
             }
                 $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
-                $productIntake->sku             = $request->sku;
                 $productIntake->imei_number     = $request->imei_number;
                 $productIntake->serial_number   = $request->serial_number;
                 $productIntake->sale_price      = $request->sale_price;
                 $productIntake->retail_price    = $request->retail_price;
                 $productIntake->invoice_number  = $request->invoice_number;
-                $productIntake->type            = $request->type;
                 $productIntake->created_by      = \Auth::user()->creatorId();
                 $productIntake->save();
                 CustomField::saveData($productIntake, $request->customField);

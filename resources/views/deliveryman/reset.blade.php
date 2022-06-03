@@ -1,4 +1,4 @@
-{{Form::model($customer,array('route' => array('customer.password.update', $customer->id), 'method' => 'post')) }}
+{{Form::model($deliveryman,array('route' => array('deliveryman.password.update', $deliveryman->id), 'method' => 'post')) }}
 <div class="modal-body">
 
 <div class="row">

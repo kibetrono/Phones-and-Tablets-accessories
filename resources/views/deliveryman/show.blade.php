@@ -2,42 +2,41 @@
 @push('script-page')
 @endpush
 @section('page-title')
-    {{__('Manage Deliveryman-Detail')}}
+    {{__('Manage Delivery Person Details')}}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('deliverman.index')}}">{{__('Deliveryman')}}</a></li>
-    <li class="breadcrumb-item">{{$deliverman['name']}}</li>
+    <li class="breadcrumb-item"><a href="{{route('deliveryman.index')}}">{{__('Delivery Person')}}</a></li>
+    <li class="breadcrumb-item">{{$deliveryperson['name']}}</li>
 @endsection
-
 @section('action-btn')
     <div class="float-end">
         @can('create invoice')
-            <a href="{{ route('invoice.create',$deliverman->id) }}" class="btn btn-sm btn-primary">
+            <a href="" class="btn btn-sm btn-primary">
                 {{__('Create Invoice')}}
             </a>
         @endcan
         @can('create proposal')
-                <a href="{{ route('proposal.create',$deliverman->id) }}" class="btn btn-sm btn-primary">
+                <a href="" class="btn btn-sm btn-primary">
                     {{__('Create Proposal')}}
                 </a>
 
         @endcan
-            <a href="{{ route('deliverman.statement',$deliverman['id']) }}" class="btn btn-sm btn-primary">
+            <a href="" class="btn btn-sm btn-primary">
                 {{__('Statement')}}
             </a>
 
              @can('edit customer')
-                <a href="#" data-size="xl" data-url="{{ route('deliverman.edit',$deliverman['id']) }}" data-ajax-popup="true" title="{{__('Edit Deliveryman')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}" class="btn btn-sm btn-primary">
+                <a href="#" data-size="xl" data-url="{{ route('deliveryman.edit',$deliveryperson['id']) }}" data-ajax-popup="true" title="{{__('Edit Delivery Person')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}" class="btn btn-sm btn-primary">
                     <i class="ti ti-pencil"></i>
                 </a>
              @endcan
 
 
         @can('delete customer')
-                {!! Form::open(['method' => 'DELETE','class' => 'delete-form-btn', 'route' => ['deliverman.destroy', $deliverman['id']]]) !!}
+                {!! Form::open(['method' => 'DELETE','class' => 'delete-form-btn', 'route' => ['deliveryman.destroy', $deliveryperson['id']]]) !!}
 
-                <a href="#" data-bs-toggle="tooltip" title="{{__('Delete Deliveryman')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{ $deliverman['id']}}').submit();" class="btn btn-sm btn-danger bs-pass-para">
+                <a href="#" data-bs-toggle="tooltip" title="{{__('Delete Delivery Person')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{ $deliveryperson['id']}}').submit();" class="btn btn-sm btn-danger bs-pass-para">
                     <i class="ti ti-trash text-white"></i>
                 </a>
                 {!! Form::close() !!}
@@ -45,93 +44,60 @@
         @endcan
     </div>
 @endsection
-
 @section('content')
     <div class="row">
         <div class="col-md-4 col-lg-4 col-xl-4">
             <div class="card customer-detail-box">
                 <div class="card-body">
-                    <h5 class="card-title">{{__('Deliveryman Info')}}</h5>
-                    <p class="card-text mb-0">{{$deliverman['name']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['email']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['contact']}}</p>
+                    <h5 class="card-title">{{__('Delivery Person Info')}}</h5>
+                    <p class="card-text mb-0">{{$deliveryperson['name']}}</p>
+                    <p class="card-text mb-0">{{$deliveryperson['email']}}</p>
+                    <p class="card-text mb-0">{{$deliveryperson['contact']}}</p>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 col-lg-4 col-xl-4">
-            <div class="card customer-detail-box">
-                <div class="card-body">
-                    <h5 class="card-title">{{__('Billing Info')}}</h5>
-                    <p class="card-text mb-0">{{$deliverman['billing_name']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['billing_phone']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['billing_address']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['billing_zip']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['billing_city'].', '. $deliverman['billing_state'] .', '.$deliverman['billing_country']}}</p>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-md-4 col-lg-4 col-xl-4">
-            <div class="card customer-detail-box">
-                <div class="card-body">
-                    <h5 class="card-title">{{__('Shipping Info')}}</h5>
-                    <p class="card-text mb-0">{{$deliverman['shipping_name']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['shipping_phone']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['shipping_address']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['shipping_zip']}}</p>
-                    <p class="card-text mb-0">{{$deliverman['shipping_city'].', '. $deliverman['billing_state'] .', '.$deliverman['billing_country']}}</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card pb-0">
-                <div class="card-body">
-                    <h5 class="card-title">{{__('Company Info')}}</h5>
-
-                    <div class="row">
-                        @php
-                            $totalInvoiceSum=$deliverman->customerTotalInvoiceSum($deliverman['id']);
-                            $totalInvoice=$deliverman->customerTotalInvoice($deliverman['id']);
-                            $averageSale=($totalInvoiceSum!=0)?$totalInvoiceSum/$totalInvoice:0;
-                        @endphp
-                        <div class="col-md-3 col-sm-6">
-                            <div class="p-4">
-                                <p class="card-text mb-0">{{__('Customer Id')}}</p>
-                                <h6 class="report-text mb-3">{{AUth::user()->customerNumberFormat($deliverman['customer_id'])}}</h6>
-                                <p class="card-text mb-0">{{__('Total Sum of Invoices')}}</p>
-                                <h6 class="report-text mb-0">{{\Auth::user()->priceFormat($totalInvoiceSum)}}</h6>
+        <div class="col-md-8 col-lg-8 col-xl-8">
+            <div class="col-md-12">
+                <div class="card pb-0">
+                    <div class="card-body">
+                        <h5 class="card-title">{{__('Company Info')}}</h5>
+    
+                        <div class="row">
+                          
+                            <div class="col-md-3 col-sm-6">
+                                <div class="">
+                                    <p class="card-text mb-2">{{__('Delivery Person Id')}}</p>
+                                    <h6 class="report-text mb-3">{{AUth::user()->deliverymanNumberFormat($deliveryperson['deliveryman_id'])}}</h6>
+                                   
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="p-4">
-                                <p class="card-text mb-0">{{__('Date of Creation')}}</p>
-                                <h6 class="report-text mb-3">{{\Auth::user()->dateFormat($deliverman['created_at'])}}</h6>
-                                <p class="card-text mb-0">{{__('Quantity of Invoice')}}</p>
-                                <h6 class="report-text mb-0">{{$totalInvoice}}</h6>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="">
+                                    <p class="card-text mb-2">{{__('Date of Creation')}}</p>
+                                    <h6 class="report-text mb-3">{{\Auth::user()->dateFormat($deliveryperson['created_at'])}}</h6>
+                                  
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="p-4">
-                                <p class="card-text mb-0">{{__('Balance')}}</p>
-                                <h6 class="report-text mb-3">{{\Auth::user()->priceFormat($deliverman['balance'])}}</h6>
-                                <p class="card-text mb-0">{{__('Average Sales')}}</p>
-                                <h6 class="report-text mb-0">{{\Auth::user()->priceFormat($averageSale)}}</h6>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="">
+                                    <p class="card-text mb-2">{{__('Balance')}}</p>
+                                    <h6 class="report-text mb-3">{{\Auth::user()->priceFormat($deliveryperson['balance'])}}</h6>
+                                    
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="p-4">
-                                <p class="card-text mb-0">{{__('Overdue')}}</p>
-                                <h6 class="report-text mb-3">{{\Auth::user()->priceFormat($deliverman->customerOverdue($deliverman['id']))}}</h6>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="">
+                                    <p class="card-text mb-2">{{__('Overdue')}}</p>
+                                    <h6 class="report-text mb-3">{{\Auth::user()->priceFormat($deliveryperson->customerOverdue($deliveryperson['id']))}}</h6>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
 
     <div class="row">
@@ -153,7 +119,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($deliverman->customerProposal($deliverman->id) as $proposal)
+                            @foreach ($deliveryperson->customerProposal($deliveryperson->id) as $proposal)
                                 <tr>
                                     <td class="Id">
                                         @if(\Auth::guard('customer')->check())
@@ -266,7 +232,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($deliverman->customerInvoice($deliverman->id) as $invoice)
+                            @foreach ($deliveryperson->customerInvoice($deliveryperson->id) as $invoice)
                                 <tr>
                                     <td class="Id">
                                         @if(\Auth::guard('customer')->check())
