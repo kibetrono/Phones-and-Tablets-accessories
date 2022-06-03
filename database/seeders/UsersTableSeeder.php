@@ -386,6 +386,38 @@ class UsersTableSeeder extends Seeder
                 'created_at' => date('Y - m - d H:i:s'),
                 'updated_at' => date('Y - m - d H:i:s'),
             ],
+            // delivery person
+            [
+                'name' => 'manage deliveryperson',
+                'guard_name' => 'web',
+                'created_at' => date('Y - m - d H:i:s'),
+                'updated_at' => date('Y - m - d H:i:s'),
+            ],
+            [
+                'name' => 'create deliveryperson',
+                'guard_name' => 'web',
+                'created_at' => date('Y - m - d H:i:s'),
+                'updated_at' => date('Y - m - d H:i:s'),
+            ],
+            [
+                'name' => 'edit deliveryperson',
+                'guard_name' => 'web',
+                'created_at' => date('Y - m - d H:i:s'),
+                'updated_at' => date('Y - m - d H:i:s'),
+            ],
+            [
+                'name' => 'delete deliveryperson',
+                'guard_name' => 'web',
+                'created_at' => date('Y - m - d H:i:s'),
+                'updated_at' => date('Y - m - d H:i:s'),
+            ],
+            [
+                'name' => 'show deliveryperson',
+                'guard_name' => 'web',
+                'created_at' => date('Y - m - d H:i:s'),
+                'updated_at' => date('Y - m - d H:i:s'),
+            ],
+            // end of delivery person
             [
                 'name' => 'manage vender',
                 'guard_name' => 'web',
@@ -1187,6 +1219,13 @@ class UsersTableSeeder extends Seeder
             ['name' => 'edit customer'],
             ['name' => 'delete customer'],
             ['name' => 'show customer'],
+            // delivery man
+            ['name' => 'manage deliveryperson'],
+            ['name' => 'create deliveryperson'],
+            ['name' => 'edit deliveryperson'],
+            ['name' => 'delete deliveryperson'],
+            ['name' => 'show deliveryperson'],
+            //end of delivey man
             ['name' => 'manage vender'],
             ['name' => 'create vender'],
             ['name' => 'edit vender'],
@@ -1339,6 +1378,13 @@ class UsersTableSeeder extends Seeder
             ['name' => 'edit customer'],
             ['name' => 'delete customer'],
             ['name' => 'show customer'],
+            // delivery man
+            ['name' => 'manage deliveryperson'],
+            ['name' => 'create deliveryperson'],
+            ['name' => 'edit deliveryperson'],
+            ['name' => 'delete deliveryperson'],
+            ['name' => 'show deliveryperson'],
+            //end of delivey man
             ['name' => 'manage vender'],
             ['name' => 'create vender'],
             ['name' => 'edit vender'],

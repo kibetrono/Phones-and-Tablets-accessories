@@ -494,7 +494,7 @@ class CustomerController extends Controller
                 $customerData = new Customer();
                 $customerData->customer_id      = $cust_id;
             }
-//            dd($customer);
+                //    dd($customer);
 
             $customerData->name             = $customer[0];
             $customerData->email            = $customer[1];

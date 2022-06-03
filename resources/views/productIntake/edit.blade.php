@@ -1,11 +1,11 @@
 
 
 <script>
-    $(document).on('click', '#main_input', function () {
-        $("#hiddenproperty").css("display", "block");
-        document.getElementById('main_input').disabled=true;
+    // $(document).on('click', '#main_input', function () {
+    //     $("#hiddenproperty").css("display", "block");
+    //     document.getElementById('main_input').disabled=true;
    
-    })
+    // })
 
 </script>
 
@@ -16,17 +16,17 @@
 
         <div  class="form-group col-md-6">
             {{ Form::label('Product', __('Product'),['class'=>'form-label']) }}<br>
-            {{-- {{ Form::select('model_name[]', $product_model_name,null, array('class' => 'form-control select2','id'=>'choices-multiple1','multiple')) }} --}}
+            {{ Form::select('model_name[]', $product_model_name,null, array('class' => 'form-control select2','id'=>'choices-multiple1')) }}
 
-            {{ Form::text('model_name[]',null, array('class' => 'form-control','required'=>'required','id'=>'main_input')) }}
+            {{-- {{ Form::text('model_name[]',null, array('class' => 'form-control','required'=>'required','id'=>'main_input')) }} --}}
 
         </div>
 
-        <div style="display: none" id="hiddenproperty" class="form-group col-md-6">
+        {{-- <div style="display: none" id="hiddenproperty" class="form-group col-md-6">
             {{ Form::label('Product', __('Phone Model'),['class'=>'form-label']) }}<br>
             {{ Form::select('model_name[]', $product_model_name,null, array('class' => 'form-control select2','id'=>'choices-multiple1')) }}
 
-        </div>
+        </div> --}}
 
         <div class="col-md-6">
             <div class="form-group">

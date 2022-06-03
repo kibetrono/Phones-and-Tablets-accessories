@@ -15,14 +15,14 @@ use App\Models\DeliveryMan;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\InvoicePayment;
-use App\Exports\CustomerExport;
-use App\Imports\CustomerImport;
 use App\Models\Mail\UserCreate;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DeliveryPersonExport;
+use App\Imports\DeliveryPersonImport;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
@@ -96,7 +96,7 @@ class DeliveryManController extends Controller
             $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
             if ($total_customer < $plan->max_deliverymen || $plan->max_deliverymen == -1) {
                 DeliveryMan::create([
-                    'deliveryman_id' => $this->customerNumber(),
+                    'deliveryman_id' => $this->deliveryPersonNumber(),
                     'name' => $request->name,
                     'contact' => $request->contact,
                     'email' => $request->email,
@@ -109,17 +109,7 @@ class DeliveryManController extends Controller
 
                 // DeliveryMan::create($request->all());
                 $customer                  = new DeliveryMan();
-                // $customer->deliveryman_id  = $this->customerNumber();
-                // $customer->name            = $request->name;
-                // $customer->contact         = $request->contact;
-                // $customer->email           = $request->email;
-                // $customer->tax_number      =$request->tax_number;
-                // $customer->password        = Hash::make($request->password);
-                // $customer->created_by      = \Auth::user()->creatorId();
-                
-                // $customer->lang = !empty($default_language) ? $default_language->value : '';
-
-                // $customer->save();
+               
                 
                 CustomField::saveData($customer, $request->customField);
             } else {
@@ -154,7 +144,7 @@ class DeliveryManController extends Controller
     }
 
 
-    function customerNumber()
+    function deliveryPersonNumber()
     {
         $latest = DeliveryMan::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
         if (!$latest) {
@@ -269,23 +259,15 @@ class DeliveryManController extends Controller
 
     public function deliveryPersonPassword($id)
     {
-        $eId        = \Crypt::decrypt($id);
+        $eId  = \Crypt::decrypt($id);
         $deliveryman = DeliveryMan::find($eId);
-
         return view('deliveryman.reset', compact('deliveryman'));
 
     }
 
     public function deliveryPersonPasswordReset(Request $request, $id)
     {
-
-        dd($request->all());
-
-        $validator = \Validator::make(
-            $request->all(), [
-                               'password' => 'required|confirmed|same:password_confirmation',
-                           ]
-        );
+        $validator = \Validator::make($request->all(), ['password' => 'required|confirmed|same:password_confirmation',]);
 
         if($validator->fails())
         {
@@ -295,16 +277,97 @@ class DeliveryManController extends Controller
         }
 
 
-        $user                 = User::where('id', $id)->first();
+        $user= DeliveryMan::where('id', $id)->first();
 
-        $user->forceFill([
-                             'password' => Hash::make($request->password),
-                         ])->save();
+        $user->forceFill(['password' => Hash::make($request->password),])->save();
 
-        return redirect()->route('deliveryman.index')->with(
-            'success', 'User Password successfully updated.'
-        );
+        return redirect()->route('deliveryman.index')->with('success', 'User Password successfully updated.');
 
 
+    }
+
+    public function export()
+    {
+        $name = 'deliveryPerson_' . date('Y-m-d i:h:s');
+        $data = Excel::download(new DeliveryPersonExport(), $name . '.xlsx');
+
+        return $data;
+    }
+
+    public function importFile()
+    {
+        return view('deliveryman.import');
+    }
+
+    public function import(Request $request)
+    {
+
+        $rules = [
+            'file' => 'required|mimes:csv,txt,xls',
+        ];
+
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+
+            return redirect()->back()->with('error', $messages->first());
+        }
+
+        $deliverypersons = (new DeliveryPersonImport())->toArray(request()->file('file'))[0];
+
+        $totalDeliveryPersons = count($deliverypersons) - 1;
+
+        $errorArray    = [];
+        $deliveryman_id = $this->deliveryPersonNumber();
+
+        for ($i = 1; $i <= count($deliverypersons) - 1; $i++) {
+            $cust_id = $deliveryman_id++;
+            $deliveryperson = $deliverypersons[$i];
+            $deliveryPersonByEmail = DeliveryMan::where('email', $deliveryperson[1])->first();
+            if (!empty($deliveryPersonByEmail)) {
+                $deliveryPersonData = $deliveryPersonByEmail;
+            } else {
+                $deliveryPersonData = new DeliveryMan();
+                $deliveryPersonData->customer_id      = $cust_id;
+            }
+
+            $deliveryPersonData->name             = $deliveryperson[0];
+            $deliveryPersonData->email            = $deliveryperson[1];
+            $deliveryPersonData->password         = Hash::make($deliveryperson[2]);
+            $deliveryPersonData->contact          = $deliveryperson[3];
+        
+            $deliveryPersonData->lang             = 'en';
+            $deliveryPersonData->is_active        = 1;
+            $deliveryPersonData->created_by       = \Auth::user()->creatorId();
+
+            if (empty($deliveryPersonData)) {
+                $errorArray[] = $deliveryPersonData;
+            } else {
+                $deliveryPersonData->save();
+
+                $role_r = Role::where('name', '=', 'customer')->firstOrFail();
+                $deliveryPersonData->assignRole($role_r);
+            }
+        }
+
+        $errorRecord = [];
+        if (empty($errorArray)) {
+            $data['status'] = 'success';
+            $data['msg']    = __('Record successfully imported');
+        } else {
+            $data['status'] = 'error';
+            $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalDeliveryPersons . ' ' . 'record');
+
+
+            foreach ($errorArray as $errorData) {
+
+                $errorRecord[] = implode(',', $errorData);
+            }
+
+            \Session::put('errorArray', $errorRecord);
+        }
+
+        return redirect()->back()->with($data['status'], $data['msg']);
     }
 }
