@@ -265,6 +265,7 @@ class ProposalController extends Controller
             if ($proposal->created_by == \Auth::user()->creatorId()) {
                 $customer = $proposal->customer;
                 $iteams   = $proposal->items;
+                
                 $status   = Proposal::$statues;
 
                 $proposal->customField = CustomField::getData($proposal, 'proposal');
