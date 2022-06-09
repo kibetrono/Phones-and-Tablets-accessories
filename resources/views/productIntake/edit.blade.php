@@ -15,7 +15,7 @@
     <div class="row">
 
         <div  class="form-group col-md-6">
-            {{ Form::label('Product', __('Product'),['class'=>'form-label']) }}<br>
+            {{ Form::label('model_name[]', __('Product'),['class'=>'form-label']) }}<br>
             {{ Form::select('model_name[]', $product_model_name,null, array('class' => 'form-control select2','id'=>'choices-multiple1')) }}
 
             {{-- {{ Form::text('model_name[]',null, array('class' => 'form-control','required'=>'required','id'=>'main_input')) }} --}}
@@ -30,7 +30,7 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('name', __('IMEI Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('imei_number', __('IMEI Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                     {{ Form::text('imei_number',null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
@@ -39,7 +39,7 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('name', __('Serial Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('serial_number', __('Serial Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                     {{ Form::text('serial_number',null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
@@ -67,9 +67,34 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('name', __('Invoice Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('invoice_number', __('Invoice Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                     {{ Form::text('invoice_number',null, array('class' => 'form-control')) }}
+                </div>
+            </div>            
+        </div>
+         <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('supplier_person', __('Supplier'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                <div class="form-icon-user">
+                    {{ Form::select('supplier_person', $the_supplier_person,null, array('class' => 'form-control select2','id'=>'choices-multiple2')) }}
+                </div>
+            </div>            
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('delivery_person', __('Delivery Person Contact'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                <div class="form-icon-user">
+                    {{ Form::select('delivery_person', $the_delivery_person,null, array('class' => 'form-control select2','id'=>'choices-multiple3')) }}
+
+                </div>
+            </div>            
+        </div>
+        <div style="display:none" class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('receiving_person', __('Receiving Person'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                <div class="form-icon-user">
+                    {{ Form::hidden('receiving_person',null, array('class' => 'form-control')) }}
                 </div>
             </div>            
         </div>
