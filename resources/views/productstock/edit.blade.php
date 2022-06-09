@@ -30,9 +30,21 @@
             {{ Form::label('quantity', __('Quantity'),['class'=>'form-label']) }}<span class="text-danger">*</span>
             {{ Form::number('quantity',"", array('class' => 'form-control','required'=>'required')) }}
         </div>
+
+         <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('status', __('Status'),['class'=>'form-label']) }}
+                <div class="form-icon-user">
+                  {{ Form::select('status', array_merge(['' => "Select Status"] + $status),null, array('class' => 'form-control select2','id'=>'choices-multiple1','required'=>'required')) }}
+
+                </div>
+            </div>
+        </div>
     </div>
+    
 </div>
 <div class="modal-footer">
+
     <input type="button" value="{{__('Cancel')}}" class="btn  btn-light" data-bs-dismiss="modal">
     <input type="submit" value="{{__('Save')}}" class="btn  btn-primary">
 </div>
