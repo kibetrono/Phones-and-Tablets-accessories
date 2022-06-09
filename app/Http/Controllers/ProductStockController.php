@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProductIntake;
 use App\Models\ProductService;
 use App\Models\ProductStock;
 use App\Models\Utility;
@@ -75,7 +76,8 @@ class ProductStockController extends Controller
         {
             if ($productService->created_by == \Auth::user()->creatorId())
             {
-                return view('productstock.edit', compact( 'productService'));
+                $status=ProductIntake::$the_status;
+                return view('productstock.edit', compact( 'productService', 'status'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
