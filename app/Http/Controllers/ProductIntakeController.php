@@ -8,9 +8,12 @@ use Illuminate\Http\Request;
 use App\Models\ProductIntake;
 use App\Models\ProductService;
 use App\Models\ProductServiceUnit;
+use App\Exports\ProductIntakeExport;
+use App\Imports\ProductIntakeImport;
 use App\Models\ProductServiceCategory;
 use App\Http\Requests\ProductIntakeStoreRequest;
-
+use App\Models\DeliveryMan;
+use App\Models\Vender;
 
 class ProductIntakeController extends Controller
 {
@@ -21,10 +24,24 @@ class ProductIntakeController extends Controller
      */
     public function index()
     {
+
+        // $productService        = new ProductIntake();
+
+        // $per = $productService->deliveryman();
+
+        // dd($per);
+
+
+        // $it=ProductIntake::$the_status;
+        // dd($it);
+
         if (\Auth::user()->can('manage product & service'))
         {
-            $productServices = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
-            return view('productIntake.index', compact('productServices'));
+            $productIntakes = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['returned','=',0]])->get();
+            $productIntakes2 = ProductIntake::where('returned', '=', 1)->get();
+            // $ret= $productIntakes;
+            // dd($productIntakes);
+            return view('productIntake.index', compact('productIntakes'));
         }
         else
         {
@@ -43,8 +60,11 @@ class ProductIntakeController extends Controller
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
 
             $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
-    // dd($product_model_name);
-            return view('productIntake.create', compact('product_model_name', 'customFields'));
+            $supplier_person            = Vender::all()->pluck('name','name');
+            $delivery_person            = DeliveryMan::all()->pluck('contact', 'contact');
+            $receiving_person            = \Auth::user()->name;
+            // dd($receiving_person);
+            return view('productIntake.create', compact('product_model_name', 'supplier_person', 'delivery_person', 'receiving_person','customFields'));
         }
         else
         {
@@ -69,6 +89,9 @@ class ProductIntakeController extends Controller
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
+                'supplier_person' => 'required',
+                'delivery_person' => 'required',
+                'receiving_person' => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -86,6 +109,9 @@ class ProductIntakeController extends Controller
             $productIntake->sale_price      = $request->sale_price;
             $productIntake->retail_price    = $request->retail_price;
             $productIntake->invoice_number  = $request->invoice_number;
+            $productIntake->supplier_person  = $request->supplier_person;
+            $productIntake->delivery_person  = $request->delivery_person;
+            $productIntake->receiving_person  = $request->receiving_person;
             $productIntake->created_by      = \Auth::user()->creatorId();
             $productIntake->save();
             CustomField::saveData($productIntake, $request->customField);
@@ -123,8 +149,11 @@ class ProductIntakeController extends Controller
             if ($productIntake->created_by == \Auth::user()->creatorId())
             {
                 $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
-
-                return view('productIntake.edit', compact( 'product_model_name','productIntake'));
+                $the_supplier_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
+                $the_delivery_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('contact', 'contact');
+                // $the_receiving_person        = ::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
+                       
+                return view('productIntake.edit', compact( 'product_model_name','productIntake', 'the_supplier_person', 'the_delivery_person'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
@@ -153,6 +182,9 @@ class ProductIntakeController extends Controller
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
+                'supplier_person' => 'required',
+                'delivery_person' => 'required',
+                'receiving_person' => 'required',
             ];
             $validator = \Validator::make($request->all(), $rules);
 
@@ -167,6 +199,9 @@ class ProductIntakeController extends Controller
                 $productIntake->sale_price      = $request->sale_price;
                 $productIntake->retail_price    = $request->retail_price;
                 $productIntake->invoice_number  = $request->invoice_number;
+                $productIntake->supplier_person  = $request->supplier_person;
+                $productIntake->delivery_person  = $request->delivery_person;
+                $productIntake->receiving_person  = $request->receiving_person;
                 $productIntake->created_by      = \Auth::user()->creatorId();
                 $productIntake->save();
                 CustomField::saveData($productIntake, $request->customField);
@@ -197,4 +232,94 @@ class ProductIntakeController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+
+    public function export()
+    {
+
+        $name = 'product_intake_' . date('Y-m-d i:h:s');
+        $data = Excel::download(new ProductIntakeExport(), $name . '.xlsx');
+
+        return $data;
+    }
+
+    public function importFile()
+    {
+        return view('productintake.import');
+    }
+  
+    public function import(Request $request)
+    {
+
+        $rules = [
+            'file' => 'required',
+        ];
+
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+
+            return redirect()->back()->with('error', $messages->first());
+        }
+        $products     = (new ProductIntakeImport)->toArray(request()->file('file'))[0];
+        $totalProduct = count($products) - 1;
+        $errorArray   = [];
+        for ($i = 1; $i <= count($products) - 1; $i++) {
+            $items  = $products[$i];
+
+            $taxes     = explode(';', $items[5]);
+
+            $taxesData = [];
+            foreach ($taxes as $tax) {
+                $taxes       = Tax::where('id', $tax)->first();
+                //                $taxesData[] = $taxes->id;
+                $taxesData[] = !empty($taxes->id) ? $taxes->id : 0;
+            }
+
+            $taxData = implode(',', $taxesData);
+            //            dd($taxData);
+
+            if (!empty($productBySku)) {
+                $productService = $productBySku;
+            } else {
+                $productService = new ProductService();
+            }
+
+            $productService->name           = $items[0];
+            $productService->sku            = $items[1];
+            $productService->quantity       = $items[2];
+            $productService->sale_price     = $items[3];
+            $productService->purchase_price = $items[4];
+            $productService->type           = $items[5];
+            $productService->description    = $items[6];
+            $productService->created_by     = \Auth::user()->creatorId();
+
+            if (empty($productService)) {
+                $errorArray[] = $productService;
+            } else {
+                $productService->save();
+            }
+        }
+
+        $errorRecord = [];
+        if (empty($errorArray)) {
+
+            $data['status'] = 'success';
+            $data['msg']    = __('Record successfully imported');
+        } else {
+            $data['status'] = 'error';
+            $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalProduct . ' ' . 'record');
+
+
+            foreach ($errorArray as $errorData) {
+
+                $errorRecord[] = implode(',', $errorData);
+            }
+
+            \Session::put('errorArray', $errorRecord);
+        }
+
+        return redirect()->back()->with($data['status'], $data['msg']);
+    }
 }
+
