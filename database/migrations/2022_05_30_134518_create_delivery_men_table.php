@@ -16,9 +16,10 @@ class CreateDeliveryMenTable extends Migration
         Schema::create('delivery_men', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('deliveryman_id');
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('tax_number');
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('password');
             $table->string('contact')->nullable();
             $table->string('avatar', 100)->default('');
