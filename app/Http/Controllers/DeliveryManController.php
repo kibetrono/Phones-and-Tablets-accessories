@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DeliveryPersonExport;
 use App\Imports\DeliveryPersonImport;
+use App\Models\ProductIntake;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,6 +39,13 @@ class DeliveryManController extends Controller
 
     public function index()
     {
+        // $productService        = new DeliveryMan();
+
+        // $per=$productService->theproductintakes();
+
+        // dd($per);
+
+        //  return theproductintakes();
 
         if (\Auth::user()->can('manage customer')) {
             $deliverypersons = DeliveryMan::where('created_by', \Auth::user()->creatorId())->get();
@@ -72,7 +80,8 @@ class DeliveryManController extends Controller
 
             // dd($request->all());
             $rules = [
-                'name' => 'required',
+                'first_name' => 'required',
+                'last_name' => 'required',
                 'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
                 'email' => 'required|email|unique:customers',
                 'password' => 'required',
@@ -85,7 +94,7 @@ class DeliveryManController extends Controller
             if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
-                return redirect()->route('customer.index')->with('error', $messages->first());
+                return redirect()->route('deliveryman.index')->with('error', $messages->first());
             }
 
             $objCustomer    = \Auth::user();
@@ -97,7 +106,8 @@ class DeliveryManController extends Controller
             if ($total_customer < $plan->max_deliverymen || $plan->max_deliverymen == -1) {
                 DeliveryMan::create([
                     'deliveryman_id' => $this->deliveryPersonNumber(),
-                    'name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
                     'contact' => $request->contact,
                     'email' => $request->email,
                     'tax_number' => $request->tax_number,
@@ -137,7 +147,7 @@ class DeliveryManController extends Controller
                 Utility::send_twilio_msg($request->contact,$msg);
            }
 
-            return redirect()->route('deliveryman.index')->with('success', __('Personel successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+            return redirect()->route('deliveryman.index')->with('success', __('Delivery Person successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -164,6 +174,10 @@ class DeliveryManController extends Controller
         
         $id       = \Crypt::decrypt($ids);
         $deliveryperson = DeliveryMan::find($id);
+
+        $delivered_items = ProductIntake::find($id);
+        // dd($delivered_items);
+        $returned_items = DeliveryMan::find($id);
         // dd($deliveryperson);
         return view('deliveryman.show', compact('deliveryperson'));
     }
@@ -205,7 +219,8 @@ class DeliveryManController extends Controller
             $deliveryMan = DeliveryMan::find($id);
 
             $rules = [
-                'name' => 'required',
+                'first_name' => 'required',
+                'last_name' => 'required',
                 'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
             ];
 
@@ -217,7 +232,8 @@ class DeliveryManController extends Controller
                 return redirect()->route('deliveryman.index')->with('error', $messages->first());
             }
 
-            $deliveryMan->name             = $request->name;
+            $deliveryMan->first_name             = $request->first_name;
+            $deliveryMan->last_name             = $request->last_name;
             $deliveryMan->contact          = $request->contact;
             $deliveryMan->email            = $request->email;
             $deliveryMan->tax_number        =$request->tax_number;
