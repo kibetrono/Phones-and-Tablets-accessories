@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Redirect;
 //     return view('dashboard');
 // })->middleware(['auth'])->name('dashboard');
 
+
 require __DIR__.'/auth.php';
 
 //Route::get('/register/{lang?}', 'Auth\RegisteredUserController@showRegistrationForm')->name('register');
@@ -237,11 +238,11 @@ Route::prefix('customer')->as('customer.')->group(
     }
 );
 
-Route::prefix('vender')->as('vender.')->group(
+Route::prefix('supplier')->as('supplier.')->group(
     function (){
-        Route::get('login/{lang}', 'Auth\AuthenticatedSessionController@showVenderLoginLang')->name('login.lang')->middleware(['XSS']);
-        Route::get('login', 'Auth\AuthenticatedSessionController@showVenderLoginForm')->name('login')->middleware(['XSS']);
-        Route::post('login', 'Auth\AuthenticatedSessionController@VenderLogin')->name('login')->middleware(['XSS']);
+        Route::get('login/{lang}', 'Auth\AuthenticatedSessionController@showsupplierLoginLang')->name('login.lang')->middleware(['XSS']);
+        Route::get('login', 'Auth\AuthenticatedSessionController@showsupplierLoginForm')->name('login')->middleware(['XSS']);
+        Route::post('login', 'Auth\AuthenticatedSessionController@supplierLogin')->name('login')->middleware(['XSS']);
 
 
         Route::get('/password/resets/{lang?}', 'Auth\AuthenticatedSessionController@showVendorLinkRequestForm')->name('change.langPass');
@@ -255,33 +256,33 @@ Route::prefix('vender')->as('vender.')->group(
 
         Route::get('dashboard', 'VenderController@dashboard')->name('dashboard')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
-        Route::get('bill', 'BillController@VenderBill')->name('bill')->middleware(
+        Route::get('bill', 'BillController@supplierBill')->name('bill')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
-        Route::get('bill/{id}/show', 'BillController@venderBillShow')->name('bill.show')->middleware(
+        Route::get('bill/{id}/show', 'BillController@supplierBillShow')->name('bill.show')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
 
 
-        Route::get('bill/{id}/send', 'BillController@venderBillSend')->name('bill.send')->middleware(
+        Route::get('bill/{id}/send', 'BillController@supplierBillSend')->name('bill.send')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
-        Route::post('bill/{id}/send/mail', 'BillController@venderBillSendMail')->name('bill.send.mail')->middleware(
+        Route::post('bill/{id}/send/mail', 'BillController@supplierBillSendMail')->name('bill.send.mail')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
@@ -289,57 +290,57 @@ Route::prefix('vender')->as('vender.')->group(
 
         Route::get('payment', 'VenderController@payment')->name('payment')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
         Route::get('transaction', 'VenderController@transaction')->name('transaction')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
-        Route::post('logout', 'VenderController@venderLogout')->name('logout')->middleware(
+        Route::post('logout', 'VenderController@supplierLogout')->name('logout')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
 
         Route::get('profile', 'VenderController@profile')->name('profile')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
 
         Route::post('update-profile', 'VenderController@editprofile')->name('update.profile')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
         Route::post('billing-info', 'VenderController@editBilling')->name('update.billing.info')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
         Route::post('shipping-info', 'VenderController@editShipping')->name('update.shipping.info')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
         Route::post('change.password', 'VenderController@updatePassword')->name('update.password')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
         Route::get('change-language/{lang}', 'VenderController@changeLanquage')->name('change.language')->middleware(
             [
-                'auth:vender',
+                'auth:supplier',
                 'XSS','revalidate',
             ]
         );
@@ -468,6 +469,27 @@ Route::resource('productintake', 'ProductIntakeController')->middleware(
     ]
 );
 
+// Customer Returns 
+Route::get('getmodelname', 'CustomerReturnsController@getModelName');
+Route::get('getimeinumber', 'CustomerReturnsController@getImeiNumber');
+Route::get('getinvoicenumber', 'CustomerReturnsController@getInvoiceNumber');
+
+Route::get('customerreturns/index', 'CustomerReturnsController@index')->name('customerreturns.index');
+Route::resource('customerreturns', 'CustomerReturnsController')->middleware(
+    [
+        'auth',
+        'XSS', 'revalidate',
+    ]
+);
+
+// Product Return 
+Route::get('productreturn/index', 'ProductReturnController@index')->name('productreturn.index');
+Route::resource('productreturn', 'ProductReturnController')->middleware(
+    [
+        'auth',
+        'XSS', 'revalidate',
+    ]
+);
 //Product Stock
 Route::resource('productstock', 'ProductStockController')->middleware(
     [
@@ -476,6 +498,27 @@ Route::resource('productstock', 'ProductStockController')->middleware(
     ]
 );
 
+
+
+// new delivery man resource
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'XSS','revalidate',
+        ],
+    ], function (){
+
+    Route::get('deliveryman/{id}/show', 'DeliveryManController@show')->name('deliveryman.show');
+    Route::ANY('deliveryman/{id}/statement', 'DeliveryManController@statement')->name('deliveryman.statement');
+    Route::any('deliveryman-reset-password/{id}', 'DeliveryManController@deliveryPersonPassword')->name('deliveryman.reset');
+    Route::post('deliveryman-reset-password/{id}', 'DeliveryManController@deliveryPersonPasswordReset')->name('deliveryman.password.update');
+    
+    Route::resource('deliveryman', 'DeliveryManController');
+
+}
+);
+// end of new delivery man resource
 
 
 // new delivery man resource
@@ -522,10 +565,10 @@ Route::group(
         ],
     ], function (){
 
-    Route::get('vender/{id}/show', 'VenderController@show')->name('vender.show');
-    Route::ANY('vender/{id}/statement', 'VenderController@statement')->name('vender.statement');
+    Route::get('supplier/{id}/show', 'VenderController@show')->name('supplier.show');
+    Route::ANY('supplier/{id}/statement', 'VenderController@statement')->name('supplier.statement');
 
-    Route::resource('vender', 'VenderController');
+    Route::resource('supplier', 'VenderController');
 
 }
 );
@@ -713,7 +756,7 @@ Route::group(
     Route::get('bill/index', 'BillController@index')->name('bill.index');
     Route::post('bill/product/destroy', 'BillController@productDestroy')->name('bill.product.destroy');
     Route::post('bill/product', 'BillController@product')->name('bill.product');
-    Route::post('bill/vender', 'BillController@vender')->name('bill.vender');
+    Route::post('bill/supplier', 'BillController@supplier')->name('bill.supplier');
     Route::get('bill/{id}/sent', 'BillController@sent')->name('bill.sent');
     Route::get('bill/{id}/resent', 'BillController@resent')->name('bill.resent');
     Route::get('bill/{id}/payment', 'BillController@payment')->name('bill.payment');
@@ -1048,6 +1091,25 @@ Route::get('export/productservice', 'ProductServiceController@export')->name('pr
 Route::get('import/productservice/file', 'ProductServiceController@importFile')->name('productservice.file.import');
 Route::post('import/productservice', 'ProductServiceController@import')->name('productservice.import');
 
+// product intake
+Route::get('export/productintake', 'ProductIntakeController@export')->name('productintake.export');
+Route::get('import/productintake/file', 'ProductIntakeController@importFile')->name('productintake.file.import');
+Route::post('import/productintake', 'ProductIntakeController@import')->name('productintake.import');
+// end of product intake
+
+// Customer Returns
+Route::get('export/customerreturns', 'CustomerReturnsController@export')->name('customerreturns.export');
+Route::get('import/customerreturns/file', 'CustomerReturnsController@importFile')->name('customerreturns.file.import');
+Route::post('import/customerreturns', 'CustomerReturnsController@import')->name('customerreturns.import');
+// end of Customer Returns
+
+
+// product return
+// Route::get('export/productreturn', 'ProductReturnController@export')->name('productreturn.export');
+// Route::get('import/productreturn/file', 'ProductReturnController@importFile')->name('productreturn.file.import');
+// Route::post('import/productreturn', 'ProductReturnController@import')->name('productreturn.import');
+// end of product return
+
 // delivery men
 Route::get('export/deliveryman', 'DeliveryManController@export')->name('deliveryman.export');
 Route::get('import/deliveryman/file', 'DeliveryManController@importFile')->name('deliveryman.file.import');
@@ -1057,9 +1119,9 @@ Route::get('export/customer', 'CustomerController@export')->name('customer.expor
 Route::get('import/customer/file', 'CustomerController@importFile')->name('customer.file.import');
 Route::post('import/customer', 'CustomerController@import')->name('customer.import');
 
-Route::get('export/vender', 'VenderController@export')->name('vender.export');
-Route::get('import/vender/file', 'VenderController@importFile')->name('vender.file.import');
-Route::post('import/vender', 'VenderController@import')->name('vender.import');
+Route::get('export/supplier', 'VenderController@export')->name('supplier.export');
+Route::get('import/supplier/file', 'VenderController@importFile')->name('supplier.file.import');
+Route::post('import/supplier', 'VenderController@import')->name('supplier.import');
 
 
 Route::get('export/Proposal', 'ProposalController@export')->name('proposal.export');
