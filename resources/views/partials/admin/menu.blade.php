@@ -175,6 +175,16 @@
                     </li>
                 @endif
 
+                {{---------  Customer Returns ------------}}
+                @if(Gate::check('manage product & service'))
+                    <li class="dash-item {{ (Request::segment(1) == 'customerreturns')?'active':''}}">
+                        <a href="{{ route('customerreturns.index') }}" class="dash-link ">
+                            <span class="dash-micon"><i class="fa fa-reply"></i></span>
+                            <span class="dash-mtext">{{__('Customer Returns')}}</span>
+                        </a>
+                    </li>
+                @endif
+
                 {{---------  Customer ------------}}
                 @if(Gate::check('manage customer'))
                     <li class="dash-item {{ (Request::segment(1) == 'customer')?'active':''}}">
@@ -187,10 +197,10 @@
 
                 {{---------  Vendor ------------}}
                 @if(Gate::check('manage vender'))
-                    <li class="dash-item {{ (Request::segment(1) == 'vender')?'active':''}}">
-                        <a href="{{ route('vender.index') }}" class="dash-link ">
+                    <li class="dash-item {{ (Request::segment(1) == 'supplier')?'active':''}}">
+                        <a href="{{ route('supplier.index') }}" class="dash-link ">
                             <span class="dash-micon"><i class="ti ti-note"></i></span>
-                            <span class="dash-mtext">{{__('Vendor')}}</span>
+                            <span class="dash-mtext">{{__('Supplier')}}</span>
                         </a>
                     </li>
                 @endif

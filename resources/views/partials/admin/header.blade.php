@@ -41,7 +41,7 @@
                             <i class="ti ti-user"></i> <span>{{__('My Profile')}}</span>
                         </a>
                     @elseif(\Auth::guard('vender')->check())
-                        <a href="{{route('vender.profile')}}" class="dropdown-item">
+                        <a href="{{route('supplier.profile')}}" class="dropdown-item">
                             <i class="ti ti-user"></i> <span>{{__('My Profile')}}</span>
                         </a>
                     @else
@@ -76,7 +76,7 @@
                                     <a class="dropdown-item" href="#" data-url="{{ route('customer.create') }}" data-ajax-popup="true" data-title="{{__('Create New Customer')}}"><i class="ti ti-user"></i>{{__('Create New Customer')}}</a>
                                 @endif
                                 @if(Gate::check('create vender'))
-                                    <a class="dropdown-item" href="#" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}"><i class="ti ti-note"></i>{{__('Create New Vendor')}}</a>
+                                    <a class="dropdown-item" href="#" data-url="{{ route('supplier.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}"><i class="ti ti-note"></i>{{__('Create New Supplier')}}</a>
                                 @endif
                                 @if(Gate::check('create customer'))
                                 <a class="dropdown-item" href="#" data-url="{{ route('deliveryman.create') }}" data-ajax-popup="true" data-title="{{__('Create New Delivery Person')}}"><i class="ti ti-note"></i>{{__('Create New Delivery Person')}}</a>
