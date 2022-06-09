@@ -15,7 +15,8 @@ class DeliveryMan extends Authenticatable
 
     protected $fillable = [
         'deliveryman_id',
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'tax_number',
         'password',
@@ -24,20 +25,6 @@ class DeliveryMan extends Authenticatable
         'is_active',
         'created_by',
         'email_verified_at',
-        'billing_name',
-        'billing_country',
-        'billing_state',
-        'billing_city',
-        'billing_phone',
-        'billing_zip',
-        'billing_address',
-        'shipping_name',
-        'shipping_country',
-        'shipping_state',
-        'shipping_city',
-        'shipping_phone',
-        'shipping_zip',
-        'shipping_address',
         'last_login_at',
     ];
 
@@ -49,6 +36,9 @@ class DeliveryMan extends Authenticatable
 
     public $settings;
 
+    public function theproductintakes(){
+        return $this->hasMany(ProductIntake::class);
+    }
 
     public function authId()
     {
