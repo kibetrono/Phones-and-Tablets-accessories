@@ -35,6 +35,7 @@ class VenderController extends Controller
 
     public function index()
     {
+        
         if (\Auth::user()->can('manage vender')) {
             $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
 
@@ -73,7 +74,7 @@ class VenderController extends Controller
             if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
-                return redirect()->route('vender.index')->with('error', $messages->first());
+                return redirect()->route('supplier.index')->with('error', $messages->first());
             }
 
             $objVendor    = \Auth::user();
@@ -133,7 +134,7 @@ class VenderController extends Controller
                 Utility::send_twilio_msg($request->contact,$msg);
             }
 
-            return redirect()->route('vender.index')->with('success', __('Vendor successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
+            return redirect()->route('supplier.index')->with('success', __('Vendor successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -179,7 +180,7 @@ class VenderController extends Controller
             if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
-                return redirect()->route('vender.index')->with('error', $messages->first());
+                return redirect()->route('supplier.index')->with('error', $messages->first());
             }
 
             $vender->name             = $request->name;
@@ -203,7 +204,7 @@ class VenderController extends Controller
             $vender->save();
             CustomField::saveData($vender, $request->customField);
 
-            return redirect()->route('vender.index')->with('success', __('Vendor successfully updated.'));
+            return redirect()->route('supplier.index')->with('success', __('Vendor successfully updated.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -216,7 +217,7 @@ class VenderController extends Controller
             if ($vender->created_by == \Auth::user()->creatorId()) {
                 $vender->delete();
 
-                return redirect()->route('vender.index')->with('success', __('Vendor successfully deleted.'));
+                return redirect()->route('supplier.index')->with('success', __('Vendor successfully deleted.'));
             } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
@@ -241,7 +242,7 @@ class VenderController extends Controller
 
         $request->session()->invalidate();
 
-        return redirect()->route('vender.login');
+        return redirect()->route('supplier.login');
     }
 
     public function payment(Request $request)
@@ -452,7 +453,7 @@ class VenderController extends Controller
     }
     public function export()
     {
-        $name = 'vendor_' . date('Y-m-d i:h:s');
+        $name = 'supplier_' . date('Y-m-d i:h:s');
         $data = Excel::download(new VenderExport(), $name . '.xlsx');
 
         return $data;
