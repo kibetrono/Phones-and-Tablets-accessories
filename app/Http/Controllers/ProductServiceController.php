@@ -230,14 +230,14 @@ class ProductServiceController extends Controller
             foreach ($taxes as $tax)
             {
                 $taxes       = Tax::where('id', $tax)->first();
-//                $taxesData[] = $taxes->id;
+                //                $taxesData[] = $taxes->id;
                 $taxesData[] = !empty($taxes->id) ? $taxes->id : 0;
 
 
             }
 
             $taxData = implode(',', $taxesData);
-//            dd($taxData);
+                //            dd($taxData);
 
             if (!empty($productBySku)) {
                 $productService = $productBySku;
