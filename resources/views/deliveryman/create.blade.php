@@ -5,9 +5,17 @@
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
-                {{Form::label('name',__('Name'),array('class'=>'form-label')) }}
+                {{Form::label('first_name',__('First Name'),array('class'=>'form-label')) }}
                 <div class="form-icon-user">
-                    {{Form::text('name',null,array('class'=>'form-control','required'=>'required'))}}
+                    {{Form::text('first_name',null,array('class'=>'form-control','required'=>'required'))}}
+                </div>
+            </div>
+        </div>
+                <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('last_name',__('Last Name'),array('class'=>'form-label')) }}
+                <div class="form-icon-user">
+                    {{Form::text('last_name',null,array('class'=>'form-control','required'=>'required'))}}
                 </div>
             </div>
         </div>

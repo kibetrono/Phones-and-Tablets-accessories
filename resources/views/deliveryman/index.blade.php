@@ -43,7 +43,10 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th> {{__('Name')}}</th>
+                                    <th> {{__('First Name')}}</th>
+                                    {{-- <th> {{__('All Products')}}</th> --}}
+
+                                    <th> {{__('Last Name')}}</th>
                                     <th> {{__('Contact')}}</th>
                                     <th> {{__('Email')}}</th>
                                     <th> {{__('Balance')}}</th>
@@ -67,7 +70,11 @@
                                             </a>
                                         @endcan 
                                     </td>
-                                    <td class="font-style">{{$del_man['name']}}</td>
+                                    <td class="font-style">{{$del_man['first_name']}}</td>
+                                    {{-- <td>{{$del_man->theproductintakes->count()}}</td> --}}
+
+                                    {{-- <td>{{$del_man->theproductintakes()}}</td> --}}
+                                    <td class="font-style">{{$del_man['last_name']}}</td>
                                     <td>{{$del_man['contact']}}</td>
                                     <td>{{$del_man['email']}}</td>
                                     <td>{{\Auth::user()->priceFormat($del_man['balance'])}}</td>
