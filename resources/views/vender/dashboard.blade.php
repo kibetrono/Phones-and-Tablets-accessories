@@ -88,7 +88,7 @@
     </script>
 @endpush
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{route('vender.dashboard')}}">{{__('Dashboard')}}</a></li>
+    <li class="breadcrumb-item"><a href="{{route('supplier.dashboard')}}">{{__('Dashboard')}}</a></li>
 @endsection
 @section('content')
     <div class="row">

@@ -1,4 +1,4 @@
-{{Form::open(array('url'=>'vender','method'=>'post'))}}
+{{Form::open(array('url'=>'supplier','method'=>'post'))}}
 <div class="modal-body">
 
     <h5 class="sub-title">{{__('Basic Info')}}</h5>

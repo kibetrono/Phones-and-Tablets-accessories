@@ -1,4 +1,4 @@
-{{Form::model($vender,array('route' => array('vender.update', $vender->id), 'method' => 'PUT')) }}
+{{Form::model($vender,array('route' => array('supplier.update', $vender->id), 'method' => 'PUT')) }}
 <div class="modal-body">
 
     <h5 class="sub-title">{{__('Basic Info')}}</h5>

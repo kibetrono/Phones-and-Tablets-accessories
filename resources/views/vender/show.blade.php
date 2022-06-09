@@ -2,11 +2,11 @@
 @push('script-page')
 @endpush
 @section('page-title')
-    {{__('Manage Vendor-Detail')}}
+    {{__('Manage Supplier-Detail')}}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item"><a href="{{route('vender.index')}}">{{__('Vendor')}}</a></li>
+    <li class="breadcrumb-item"><a href="{{route('supplier.index')}}">{{__('Supplier')}}</a></li>
     <li class="breadcrumb-item">{{$vendor['name']}}</li>
 
     @endsection
@@ -18,16 +18,16 @@
                 {{__('Create Bill')}}
             </a>
         @endcan
-        <a href="{{ route('vender.statement',$vendor['id']) }}" class="btn btn-sm btn-primary">
+        <a href="{{ route('supplier.statement',$vendor['id']) }}" class="btn btn-sm btn-primary">
             {{__('Statement')}}
         </a>
             @can('edit vender')
-                <a href="#" class="btn btn-sm btn-primary" data-size="xl" data-url="{{ route('vender.edit',$vendor['id']) }}" data-ajax-popup="true" title="{{__('Edit')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                <a href="#" class="btn btn-sm btn-primary" data-size="xl" data-url="{{ route('supplier.edit',$vendor['id']) }}" data-ajax-popup="true" title="{{__('Edit')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                     <i class="ti ti-pencil"></i>
                 </a>
             @endcan
         @can('delete vender')
-                {!! Form::open(['method' => 'DELETE', 'route' => ['vender.destroy', $vendor['id']],'class'=>'delete-form-btn','id'=>'delete-form-'.$vendor['id']]) !!}
+                {!! Form::open(['method' => 'DELETE', 'route' => ['supplier.destroy', $vendor['id']],'class'=>'delete-form-btn','id'=>'delete-form-'.$vendor['id']]) !!}
                 <a href="#" class="btn btn-sm btn-danger bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}"  data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?').'|'.__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{ $vendor['id']}}').submit();">
                     <i class="ti ti-trash text-white"></i>
                 </a>
@@ -146,7 +146,7 @@
                                 <tr class="font-style">
                                     <td class="Id">
                                         @if(\Auth::guard('vender')->check())
-                                            <a href="{{ route('vender.bill.show',\Crypt::encrypt($bill->id)) }}" class="btn btn-outline-primary">{{ AUth::user()->billNumberFormat($bill->bill_id) }}
+                                            <a href="{{ route('supplier.bill.show',\Crypt::encrypt($bill->id)) }}" class="btn btn-outline-primary">{{ AUth::user()->billNumberFormat($bill->bill_id) }}
                                             </a>
                                         @else
                                             <a href="{{ route('bill.show',\Crypt::encrypt($bill->id)) }}" class="btn btn-outline-primary">{{ AUth::user()->billNumberFormat($bill->bill_id) }}
@@ -189,7 +189,7 @@
                                                 @can('show bill')
                                                     @if(\Auth::guard('vender')->check())
                                                         <div class="action-btn bg-info ms-2">
-                                                            <a href="{{ route('vender.bill.show',\Crypt::encrypt($bill->id)) }}" class="mx-3 btn btn-sm  align-items-center" data-bs-toggle="tooltip"  title="{{__('Show')}}" data-original-title="{{__('Detail')}}">
+                                                            <a href="{{ route('supplier.bill.show',\Crypt::encrypt($bill->id)) }}" class="mx-3 btn btn-sm  align-items-center" data-bs-toggle="tooltip"  title="{{__('Show')}}" data-original-title="{{__('Detail')}}">
                                                                 <i class="ti ti-eye text-white text-white"></i>
                                                             </a>
                                                         </div>

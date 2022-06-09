@@ -16,24 +16,24 @@ $profile = asset(Storage::url('uploads/avatar/'));
     </script>
 @endpush
 @section('page-title')
-    {{ __('Manage Vendors') }}
+    {{ __('Manage Suppliers') }}
 @endsection
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
-    <li class="breadcrumb-item">{{__('Vendor')}}</li>
+    <li class="breadcrumb-item">{{__('Supplier')}}</li>
 @endsection
 @section('action-btn')
     <div class="float-end">
-        <a href="#" class="btn btn-sm btn-primary" data-url="{{ route('vender.file.import') }}" data-ajax-popup="true" data-bs-toggle="tooltip"
+        <a href="#" class="btn btn-sm btn-primary" data-url="{{ route('supplier.file.import') }}" data-ajax-popup="true" data-bs-toggle="tooltip"
            title="{{ __('Import') }}">
             <i class="ti ti-file-import"></i>
         </a>
 
-        <a href="{{ route('vender.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{ __('Export') }}">
+        <a href="{{ route('supplier.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{ __('Export') }}">
             <i class="ti ti-file-export"></i>
         </a>
         @can('create vender')
-            <a href="#" data-size="xl" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}" data-bs-toggle="tooltip" title="{{ __('Create') }}" class="btn btn-sm btn-primary">
+            <a href="#" data-size="xl" data-url="{{ route('supplier.create') }}" data-ajax-popup="true" data-title="{{__('Create New Supplier')}}" data-bs-toggle="tooltip" title="{{ __('Create') }}" class="btn btn-sm btn-primary">
                 <i class="ti ti-plus"></i>
             </a>
         @endcan
@@ -63,7 +63,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                     <tr class="cust_tr" id="vend_detail">
                                         <td class="Id">
                                             @can('show vender')
-                                                <a href="{{ route('vender.show', \Crypt::encrypt($Vender['id'])) }}" class="btn btn-outline-primary">
+                                                <a href="{{ route('supplier.show', \Crypt::encrypt($Vender['id'])) }}" class="btn btn-outline-primary">
                                                     {{ AUth::user()->venderNumberFormat($Vender['vender_id']) }}
                                                 </a>
                                             @else
@@ -85,7 +85,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                 @else
                                                     @can('show vender')
                                                         <div class="action-btn bg-info ms-2">
-                                                            <a href="{{ route('vender.show', \Crypt::encrypt($Vender['id'])) }}"
+                                                            <a href="{{ route('supplier.show', \Crypt::encrypt($Vender['id'])) }}"
                                                                 class="mx-3 btn btn-sm align-items-center" data-bs-toggle="tooltip"
                                                                 title="{{ __('View') }}">
                                                                 <i class="ti ti-eye text-white text-white"></i>
@@ -95,8 +95,8 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                     @can('edit vender')
                                                             <div class="action-btn bg-primary ms-2">
                                                                 <a href="#" class="mx-3 btn btn-sm align-items-center" data-size="xl"
-                                                                data-title="{{__('Edit Vendor')}}"
-                                                                    data-url="{{ route('vender.edit', $Vender['id']) }}"
+                                                                data-title="{{__('Edit Supplier')}}"
+                                                                    data-url="{{ route('supplier.edit', $Vender['id']) }}"
                                                                     data-ajax-popup="true" title="{{ __('Edit') }}"
                                                                     data-bs-toggle="tooltip" data-original-title="{{ __('Edit') }}">
                                                                     <i class="ti ti-pencil text-white"></i>
@@ -105,7 +105,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                                     @endcan
                                                     @can('delete vender')
                                                             <div class="action-btn bg-danger ms-2">
-                                                            {!! Form::open(['method' => 'DELETE', 'route' => ['vender.destroy', $Vender['id']], 'id' => 'delete-form-' . $Vender['id']]) !!}
+                                                            {!! Form::open(['method' => 'DELETE', 'route' => ['supplier.destroy', $Vender['id']], 'id' => 'delete-form-' . $Vender['id']]) !!}
 
                                                             <a href="#" class="mx-3 btn btn-sm align-items-center bs-pass-para" data-bs-toggle="tooltip"
                                                                    data-original-title="{{ __('Delete') }}" title="{{ __('Delete') }}"

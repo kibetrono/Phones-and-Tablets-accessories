@@ -1,5 +1,5 @@
 <div class="card bg-none card-box">
-    {{ Form::open(array('route' => array('vender.bill.send.mail',$bill_id))) }}
+    {{ Form::open(array('route' => array('supplier.bill.send.mail',$bill_id))) }}
     <div class="row">
         <div class="form-group col-md-12">
             {{ Form::label('email', __('Email')) }}

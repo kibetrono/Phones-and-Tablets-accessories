@@ -5,7 +5,7 @@
     {{__('Transaction')}}
 @endsection
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{route('vender.dashboard')}}">{{__('Dashboard')}}</a></li>
+    <li class="breadcrumb-item"><a href="{{route('supplier.dashboard')}}">{{__('Dashboard')}}</a></li>
     <li class="breadcrumb-item">{{__('Transaction')}}</li>
 @endsection
 @section('action-btn')
@@ -21,7 +21,7 @@
             <div class="collapse multi-collapse mt-2 " id="multiCollapseExample1">
                 <div class="card">
                     <div class="card-body">
-                        {{ Form::open(array('route' => array('vender.transaction'),'method' => 'GET','id'=>'frm_submit')) }}
+                        {{ Form::open(array('route' => array('supplier.transaction'),'method' => 'GET','id'=>'frm_submit')) }}
                         <div class="row align-items-center justify-content-end">
                             <div class="col-xl-10">
                                 <div class="row">
@@ -59,7 +59,7 @@
                                             <span class="btn-inner--icon"><i class="ti ti-search"></i></span>
                                         </a>
 
-                                        <a href="{{route('vender.transaction')}}" class="btn btn-sm btn-danger " data-bs-toggle="tooltip"  title="{{ __('Reset') }}" data-original-title="{{__('Reset')}}">
+                                        <a href="{{route('supplier.transaction')}}" class="btn btn-sm btn-danger " data-bs-toggle="tooltip"  title="{{ __('Reset') }}" data-original-title="{{__('Reset')}}">
                                             <span class="btn-inner--icon"><i class="ti ti-trash-off text-white-off "></i></span>
                                         </a>
 

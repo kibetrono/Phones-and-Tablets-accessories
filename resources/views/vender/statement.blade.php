@@ -41,7 +41,7 @@
         <div class="col-md-4 col-lg-4 col-xl-4">
             <div class="card bg-none invo-tab">
                 <div class="card-body">
-                    {{Form::model($vendorDetail,array('route' => array('vender.statement' , $vendor->id), 'method' => 'post'))}}
+                    {{Form::model($vendorDetail,array('route' => array('supplier.statement' , $vendor->id), 'method' => 'post'))}}
                     <h3 class="small-title">{{$vendor['name'].' '.__('Statement')}}</h3>
                     <div class="row issue_date">
                         <div class="col-md-6">

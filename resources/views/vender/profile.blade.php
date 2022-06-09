@@ -41,7 +41,7 @@
                     <h5>{{('System Setting')}}</h5>
                 </div>
                 <div class="card-body">
-                    {{Form::model($userDetail,array('route' => array('vender.update.profile'), 'method' => 'post', 'enctype' => "multipart/form-data"))}}
+                    {{Form::model($userDetail,array('route' => array('supplier.update.profile'), 'method' => 'post', 'enctype' => "multipart/form-data"))}}
                     @csrf
                     <div class="row">
                         <div class="col-lg-6 col-sm-6">
@@ -92,7 +92,7 @@
                     <h5>{{('Billing Info')}}</h5>
                 </div>
                 <div class="card-body">
-                    {{Form::model($userDetail,array('route' => array('vender.update.billing.info'), 'method' => 'post'))}}
+                    {{Form::model($userDetail,array('route' => array('supplier.update.billing.info'), 'method' => 'post'))}}
                     @csrf
                     <div class="row">
                         <div class="col-lg-4 col-sm-4 form-group">
@@ -175,7 +175,7 @@
                     <h5>{{('Shipping Info')}}</h5>
                 </div>
                 <div class="card-body">
-                    {{Form::model($userDetail,array('route' => array('vender.update.shipping.info'), 'method' => 'post'))}}
+                    {{Form::model($userDetail,array('route' => array('supplier.update.shipping.info'), 'method' => 'post'))}}
                     @csrf
                     <div class="row">
                         <div class="col-lg-4 col-sm-4 form-group">
@@ -259,7 +259,7 @@
                     <h5>{{('Change Password')}}</h5>
                 </div>
                 <div class="card-body">
-                    {{Form::model($userDetail,array('route' => array('vender.update.password',$userDetail->id), 'method' => 'post'))}}
+                    {{Form::model($userDetail,array('route' => array('supplier.update.password',$userDetail->id), 'method' => 'post'))}}
                         @csrf
                         <div class="row">
                             <div class="col-lg-6 col-sm-6 form-group">
