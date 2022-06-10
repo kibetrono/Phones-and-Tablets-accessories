@@ -90,7 +90,19 @@
                                     <td>{{ $productIntake->sale_price }}</td>
                                     <td>{{ $productIntake->retail_price }}</td>
                                     <td>{{ $productIntake->invoice_number }}</td>
-                                    <td></td>
+                                    <td>
+                                        @if($productIntake->status == 0)
+                                            <span class="badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
+                                        @elseif($productIntake->status == 1)
+                                            <span class="badge bg-info p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
+                                        @elseif($productIntake->status == 2)
+                                            <span class="badge bg-success p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
+                                        @elseif($productIntake->status == 3)
+                                            <span class="badge bg-warning p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
+                                        @elseif($productIntake->status == 4)
+                                            <span class="badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
+                                        @endif
+                                    </td>
                                     <td class="Action">
                                   
                                     @can('edit customer')
