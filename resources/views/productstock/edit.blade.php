@@ -31,17 +31,18 @@
             {{ Form::number('quantity',"", array('class' => 'form-control','required'=>'required')) }}
         </div>
 
-         <div class="col-md-6">
-            <div class="form-group">
-                {{ Form::label('status', __('Status'),['class'=>'form-label']) }}
-                <div class="form-icon-user">
-                  {{ Form::select('status', array_merge(['' => "Select Status"] + $status),null, array('class' => 'form-control select2','id'=>'choices-multiple1','required'=>'required')) }}
-
-                </div>
-            </div>
+        <div class="form-group col-md-6">
+        <p class="btn btn-primary status_change" data-url="{{route('product.status.change',$productService->id)}}">Sync Product</p>
         </div>
+        <div class="form-group col-md-6" id="msg" style="display: none">
+            <h5 class="pt-3" style="color:green">Status changed</h5>
+        </div>
+
+
+ 
     </div>
-    
+
+
 </div>
 <div class="modal-footer">
 
@@ -49,3 +50,29 @@
     <input type="submit" value="{{__('Save')}}" class="btn  btn-primary">
 </div>
 {{Form::close()}}
+
+
+{{-- 
+<select class="form-control status_change select2 mb-4" name="status" id="" data-url="{{route('product.status.change',$productService->id)}}">
+@foreach ($status as $key=>$value)
+    <option value="{{$key}}" {{($productService->status==$key)?'selected':''}}> {{$value}}</option>
+
+@endforeach
+</select> --}}
+<script>
+    $(document).on('click', '.status_change', function () {
+            var status ='<?php echo $stock_status ?>';
+                
+            var url = $(this).data('url');
+            $.ajax({
+                url: url + '?status=' + status,
+                type: 'GET',
+                cache: false,
+                success: function (data) {
+                    $('#msg').show().delay(1000).fadeOut(2000)
+                },
+            });
+        });
+
+
+</script>
