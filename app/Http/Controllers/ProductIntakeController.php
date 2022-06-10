@@ -109,6 +109,7 @@ class ProductIntakeController extends Controller
             $productIntake->sale_price      = $request->sale_price;
             $productIntake->retail_price    = $request->retail_price;
             $productIntake->invoice_number  = $request->invoice_number;
+            $productIntake->status          = 0;
             $productIntake->supplier_person  = $request->supplier_person;
             $productIntake->delivery_person  = $request->delivery_person;
             $productIntake->receiving_person  = $request->receiving_person;

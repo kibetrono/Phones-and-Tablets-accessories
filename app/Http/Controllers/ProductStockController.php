@@ -77,7 +77,10 @@ class ProductStockController extends Controller
             if ($productService->created_by == \Auth::user()->creatorId())
             {
                 $status=ProductIntake::$the_status;
-                return view('productstock.edit', compact( 'productService', 'status'));
+                $keys = array_keys($status);
+                $stock_status= $keys[1];
+                
+                return view('productstock.edit', compact( 'productService', 'stock_status'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }

@@ -267,7 +267,7 @@ class ProposalController extends Controller
                 $iteams   = $proposal->items;
                 
                 $status   = Proposal::$statues;
-
+                
                 $proposal->customField = CustomField::getData($proposal, 'proposal');
                 $customFields          = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'proposal')->get();
 
@@ -340,6 +340,7 @@ class ProposalController extends Controller
             if ($proposal->created_by == \Auth::user()->creatorId()) {
                 $customer = $proposal->customer;
                 $iteams   = $proposal->items;
+
 
                 return view('proposal.view', compact('proposal', 'customer', 'iteams'));
             } else {
@@ -491,6 +492,7 @@ class ProposalController extends Controller
         }
     }
 
+    
     public function statusChange(Request $request, $id)
     {
         $status           = $request->status;
