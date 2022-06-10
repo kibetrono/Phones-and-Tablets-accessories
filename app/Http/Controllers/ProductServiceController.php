@@ -17,6 +17,17 @@ use App\Imports\ProductServiceImport;
 
 class ProductServiceController extends Controller
 {
+
+    public function changeStatus(Request $request, $id)
+    {
+
+        $status           = $request->status;
+        $pro         = ProductService::find($id);
+        $pro->status = $status;
+        $pro->save();
+        return redirect()->back();
+    }
+
     public function index(Request $request)
     {
 
@@ -82,6 +93,7 @@ class ProductServiceController extends Controller
             $productService                 = new ProductService();
             $productService->name           = $request->name;
             $productService->description    = $request->description;
+            $productService->status         = 0;
             $productService->sku            = $request->sku;
             $productService->sale_price     = $request->sale_price;
             $productService->purchase_price = $request->purchase_price;
