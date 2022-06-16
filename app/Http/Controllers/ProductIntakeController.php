@@ -3,20 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tax;
+use App\Models\Vender;
 use App\Models\CustomField;
+use App\Models\DeliveryMan;
 use Illuminate\Http\Request;
 use App\Models\ProductIntake;
 use App\Models\ProductService;
 use App\Models\ProductServiceUnit;
+use Illuminate\Support\Facades\DB;
 use App\Exports\ProductIntakeExport;
 use App\Imports\ProductIntakeImport;
 use App\Models\ProductServiceCategory;
 use App\Http\Requests\ProductIntakeStoreRequest;
-use App\Models\DeliveryMan;
-use App\Models\Vender;
 
 class ProductIntakeController extends Controller
 {
+
+    public function getDeliveyManId(Request $request)
+    {
+        $prodc = DeliveryMan::select('id')->where('contact', $request->delivery_person)->first();
+        return response()->json($prodc);
+    }
+
+    public function getModelNameId(Request $request)
+    {
+        $prodc = ProductService::select('id')->where('name', $request->model_name)->first();
+        // $prodc = ProductService::all();
+        return response()->json($prodc);
+    }
+
+    public function totalRepeatedName()
+    {
+        $total = ProductIntake::groupBy('status')
+        ->selectRaw('count(*) as count, status')
+        ->where('status','=','shopreturn')
+        ->pluck('count');
+        // return $total;
+        return response()->json($total);
+
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -25,11 +51,28 @@ class ProductIntakeController extends Controller
     public function index()
     {
 
-        // $productService        = new ProductIntake();
+        // $prods=DeliveryMan::all();
 
-        // $per = $productService->deliveryman();
+        // return view('test.index2', compact('prods'));
 
-        // dd($per);
+
+        // $products = \App\Models\ProductService::with('productservice')->get();
+        // $products =ProductService::find(1);
+
+        // $ser=$products->productintake;
+        
+        // dd($ser);
+
+        // return view('test.index', compact('products'));
+
+        // $productService        = \App\Models\DeliveryMan::with('theproductintakes')->get();
+
+        // $productService        = \App\Models\ProductIntake::with('productservice')->get();
+
+
+        // $per = $productService;
+
+        // dd($productService);
 
 
         // $it=ProductIntake::$the_status;
@@ -38,6 +81,7 @@ class ProductIntakeController extends Controller
         if (\Auth::user()->can('manage product & service'))
         {
             $productIntakes = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['returned','=',0]])->get();
+
             $productIntakes2 = ProductIntake::where('returned', '=', 1)->get();
             // $ret= $productIntakes;
             // dd($productIntakes);
@@ -58,13 +102,15 @@ class ProductIntakeController extends Controller
     {
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
+            
 
             $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
             $supplier_person            = Vender::all()->pluck('name','name');
             $delivery_person            = DeliveryMan::all()->pluck('contact', 'contact');
+            $delivery_person_concat = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
             $receiving_person            = \Auth::user()->name;
             // dd($receiving_person);
-            return view('productIntake.create', compact('product_model_name', 'supplier_person', 'delivery_person', 'receiving_person','customFields'));
+            return view('productIntake.create', compact('product_model_name', 'supplier_person', 'delivery_person', 'receiving_person', 'delivery_person_concat','customFields'));
         }
         else
         {
@@ -86,12 +132,17 @@ class ProductIntakeController extends Controller
                 'model_name' => 'required',
                 'imei_number' =>'required',
                 'serial_number' =>'required',
+                'product_service_id' => 'required',
+                
+                'delivery_man_id' => 'required',
+
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
                 'supplier_person' => 'required',
                 'delivery_person' => 'required',
                 'receiving_person' => 'required',
+                
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -106,10 +157,12 @@ class ProductIntakeController extends Controller
             $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
             $productIntake->imei_number     = $request->imei_number;
             $productIntake->serial_number   = $request->serial_number;
+            $productIntake->product_service_id   = $request->product_service_id;
+            $productIntake->delivery_man_id = $request->delivery_man_id;
             $productIntake->sale_price      = $request->sale_price;
             $productIntake->retail_price    = $request->retail_price;
             $productIntake->invoice_number  = $request->invoice_number;
-            $productIntake->status          = 0;
+            $productIntake->status          = 'received';
             $productIntake->supplier_person  = $request->supplier_person;
             $productIntake->delivery_person  = $request->delivery_person;
             $productIntake->receiving_person  = $request->receiving_person;
@@ -197,6 +250,8 @@ class ProductIntakeController extends Controller
                 $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
                 $productIntake->imei_number     = $request->imei_number;
                 $productIntake->serial_number   = $request->serial_number;
+                // $productIntake->delivery_man_id   = $request->delivery_person;
+            
                 $productIntake->sale_price      = $request->sale_price;
                 $productIntake->retail_price    = $request->retail_price;
                 $productIntake->invoice_number  = $request->invoice_number;
