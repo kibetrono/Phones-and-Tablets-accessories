@@ -11,23 +11,16 @@ use App\Models\CustomerReturns;
 class CustomerReturnsController extends Controller
 {
 
-    public function getModelName(Request $request)
+    public function getproductData(Request $request)
     {        
-        $prodc = ProductIntake::select('model_name')->where('serial_number', $request->serial_number)->first();
+        $prodc = ProductIntake::select('id','model_name', 'imei_number', 'invoice_number', 'status')
+        ->where('serial_number', $request->serial_number)->first();
         return response()->json($prodc);
     }
 
-    public function getImeiNumber(Request $request)
-    {
-        $prodc = ProductIntake::select('imei_number')->where('serial_number', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
 
-    public function getInvoiceNumber(Request $request)
-    {
-        $prodc = ProductIntake::select('invoice_number')->where('serial_number', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
+
+
 
     /**
      * Display a listing of the resource.
@@ -38,6 +31,7 @@ class CustomerReturnsController extends Controller
     {
         if (\Auth::user()->can('manage product & service')) {
             $customerReturns = CustomerReturns::where('created_by', '=', \Auth::user()->creatorId())->get();
+            // $customerReturns = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['status','=','received']])->get();
 
             // dd($productIntakes);
             return view('customerreturns.index', compact('customerReturns'));
@@ -55,18 +49,14 @@ class CustomerReturnsController extends Controller
     {
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $pro = ProductIntake::all();
-
-            $product_serial_number      = ProductIntake::all()->pluck('serial_number', 'serial_number')->toArray();
-            // $ppp= $product_serial_number->prepend('Please Select');
+            $status= 'custreturn';
+            $product_serial_number      = ProductIntake::where('status', '!=', $status)->pluck('serial_number', 'serial_number')->toArray();
             $returning_customer         = Customer::all()->pluck('name', 'name')->toArray();
             $receiving_person           = \Auth::user()->name;
-            // $services = ProductIntake::all();
-            // return view('customerreturns.create', compact('services'));
-                    // return view('customerreturns.create2', compact('otheritems'));
-
-            return view('customerreturns.create', compact('product_serial_number', 'returning_customer', 'receiving_person', 'customFields','pro'));
+        
+            return view('customerreturns.create', compact('product_serial_number', 'returning_customer', 'receiving_person', 'customFields'));
         } else {
+
             return response()->json(['error' => __('Permission denied.')], 401);
         } 
     }
@@ -82,14 +72,18 @@ class CustomerReturnsController extends Controller
         // dd($request->all());
         if (\Auth::user()->can('create product & service')) {
 
+            // $pr= ProductIntake::where('id',$request->product_id)->get();
+
+            // dd($pr);
+
             $rules = [
                 'model_name' => 'required',
                 'imei_number' => 'required',
                 'serial_number' => 'required',
-                'quantity_delivered' => 'required',
+                // 'quantity_delivered' => 'required',
                 // 'invoice_number' => 'required',
                 'returning_customer' => 'required',
-                'receiving_person' => 'required',
+                // 'receiving_person' => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -104,13 +98,19 @@ class CustomerReturnsController extends Controller
             $customerReturns->model_name      =  $request->model_name;
             $customerReturns->imei_number     = $request->imei_number;
             $customerReturns->serial_number   = $request->serial_number;
-            $customerReturns->quantity_delivered   = $request->quantity_delivered;
+            $customerReturns->quantity_delivered   = 1;
             $customerReturns->invoice_number  = $request->invoice_number;
             $customerReturns->returning_customer  = $request->returning_customer;
-            $customerReturns->receiving_person  = $request->receiving_person;
+            $customerReturns->receiving_person  =\Auth::user()->name;
             $customerReturns->created_by      = \Auth::user()->creatorId();
             $customerReturns->save();
             CustomField::saveData($customerReturns, $request->customField);
+
+            if($customerReturns->save()){
+
+           ProductIntake::where('id',$request->product_id)->update(array('status'=>'custreturn'));
+
+            };
 
             return redirect()->route('customerreturns.index')->with('success', __('Product successfully submitted.'));
         } else {

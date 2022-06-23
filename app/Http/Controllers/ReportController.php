@@ -2,26 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BankAccount;
-use App\Models\Bill;
-use App\Models\BillProduct;
-use App\Models\ChartOfAccount;
-use App\Models\ChartOfAccountSubType;
-use App\Models\ChartOfAccountType;
-use App\Models\Customer;
-use App\Models\Invoice;
-use App\Models\InvoiceProduct;
-use App\Models\JournalItem;
-use App\Models\Payment;
-use App\Models\ProductService;
-use App\Models\ProductServiceCategory;
-use App\Models\Revenue;
-use App\Models\StockReport;
 use App\Models\Tax;
+use App\Models\Bill;
+use App\Models\Order;
 use App\Models\Vender;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\Revenue;
 use App\Models\Utility;
-
+use App\Models\Customer;
+use App\Models\BankAccount;
+use App\Models\BillProduct;
+use App\Models\JournalItem;
+use App\Models\StockReport;
 use Illuminate\Http\Request;
+use App\Models\ProductIntake;
+use App\Models\ChartOfAccount;
+use App\Models\InvoiceProduct;
+use App\Models\ProductService;
+use Illuminate\Support\Carbon;
+
+use App\Models\ChartOfAccountType;
+use Illuminate\Support\Facades\DB;
+use App\Models\ChartOfAccountSubType;
+use App\Models\ProductServiceCategory;
 
 class ReportController extends Controller
 {
@@ -1552,8 +1556,8 @@ class ReportController extends Controller
 
 
             $journalItems = JournalItem::select('journal_entries.journal_id', 'journal_entries.date as transaction_date', 'journal_items.*')->leftjoin('journal_entries', 'journal_entries.id', 'journal_items.journal')->where('journal_entries.created_by', '=', \Auth::user()->creatorId())->where('account', !empty($account) ? $account->id : 0);
-//            $journalItems->where('date', '>=', $start);
-//            $journalItems->where('date', '<=', $end);
+                  //            $journalItems->where('date', '>=', $start);
+                   //            $journalItems->where('date', '<=', $end);
             $journalItems = $journalItems->get();
 
             $balance = 0;
@@ -1637,6 +1641,93 @@ class ReportController extends Controller
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
 
+    }
+
+    public function getAjaxResults(Request $request){
+        // $start_date = Carbon::parse($request->start_date)
+        //     ->toDateTimeString();
+
+        // $end_date = Carbon::parse($request->end_date)
+        //     ->toDateTimeString();
+
+        // return User::whereBetween('created_at', [$start_date, $end_date])->get();
+
+        if($request->date_range_name == 0){
+            $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
+            $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
+                ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            return response()->json($data);
+
+        }elseif($request->date_range_name == 1){
+            $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
+            $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
+                ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            return response()->json($data);
+
+        }elseif ($request->date_range_name == 2) {
+            $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
+            ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            return response()->json($data);
+
+        }elseif ($request->date_range_name == 3) {
+
+            $data = ProductIntake::select('*', DB::raw('SUM(sale_price) as total_points'))->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
+                ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            
+            //     $total_p = $data->sum('sale_price');
+            // $html = view("report.daily-report", compact('total_p'))->render();
+
+            
+                return response()->json($data);
+        }
+        else{       
+        $data=ProductIntake::select('*')->where('updated_at',$request->date_range_name)->where('model_name', $request->product_name)
+        ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+
+        // $sum=$data->sum('sale_price');
+        // dd($sum);
+        // return response()->json($data);
+
+            return response()->json($data);
+
+
+        }
+
+    }
+
+    public function dailyReport(Request $request){
+
+        if (\Auth::user()->can('stock report')) {
+            
+            $products=ProductIntake::where('status','=','sold')->whereDate('updated_at', Carbon::today())->get();
+            $total_price=$products->sum('sale_price');
+            $total_phones= count($products);
+            // $today=Carbon::today();
+            $today = Carbon::now()->format('Y-m-d'); //yyyy-mm-dd etc
+            $yesterday = Carbon::yesterday()->format('Y-m-d');
+            
+            $date_range=[
+                $today =>'Today',
+                $yesterday => 'Yesterday',
+                'Last 7 Days',
+                'This Month',
+                'Last Month',
+                'Custom Range',
+            ];
+
+            // $date_range=array_values($date_ranges);
+            $productselect=ProductIntake::all()->pluck('model_name','model_name');
+            $supplierselect=Vender::all()->pluck('name','name');
+            
+            $the_status=ProductIntake::$the_status;
+            // $ajaxdata='';
+
+            // dd($ajaxdata);
+
+            return view('report.daily-report', compact('products', 'total_phones', 'total_price', 'date_range', 'productselect', 'supplierselect', 'the_status'));
+        } else {
+            return redirect()->back()->with('error', __('Permission Denied.'));
+        }
     }
 
 

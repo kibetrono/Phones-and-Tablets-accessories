@@ -2,59 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Vender;
 use App\Models\Customer;
 use App\Models\CustomField;
 use App\Models\DeliveryMan;
-use App\Models\ProductIntake;
 use Illuminate\Http\Request;
+use App\Models\ProductIntake;
 use App\Models\ProductReturn;
 use App\Models\ProductService;
-use App\Models\Vender;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ProductReturnController extends Controller
 {
 
-    public function getModelName(Request $request)
+    public function getProductDetails(Request $request)
     {
-        $prodc = ProductIntake::select('model_name')->where('id', $request->serial_number)->first();
+        $prodc = ProductIntake::select('model_name', 'imei_number', 'invoice_number','sale_price', 'retail_price', 'supplier_person')->where('id', $request->serial_number)->first();
         return response()->json($prodc);
     }
 
-    public function getImeiNumber(Request $request)
-    {
-        $prodc = ProductIntake::select('imei_number')->where('id', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
-
-    public function getInvoiceNumber(Request $request)
-    {
-        $prodc = ProductIntake::select('invoice_number')->where('id', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
-
-    public function getSalePrice(Request $request)
-    {
-        $prodc = ProductIntake::select('sale_price')->where('id', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
-
-    public function getRetailPrice(Request $request)
-    {
-        $prodc = ProductIntake::select('retail_price')->where('id', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
-
-    public function getSupplier(Request $request)
-    {
-        $prodc = ProductIntake::select('supplier_person')->where('id', $request->serial_number)->first();
-        return response()->json($prodc);
-    }
 
     public function getDeliveryPerson(Request $request)
     {
-        $prodc = ProductIntake::select('delivery_person')->where('id', $request->serial_number)->first();
+        $prodc = ProductIntake::with('deliveryman')->select('delivery_person','delivery_man_id')->where('id', $request->serial_number)->first();
+        // $products = $prodc->deliveryman; //belongsTo relationship
+
+        // $prodc = ProductIntake::select(DB::raw("CONCAT(first_name,' ',last_name) AS bothNames"), 'delivery_man_id')->where('id', $request->serial_number)->first();
         return response()->json($prodc);
+        // return json_encode(['products' => $products]);
+
+    }
+
+    public function getDeliveryPersonTwo(Request $request)
+    {
+      
+        $prodc = DeliveryMan::select('id', 'contact')->Where(DB::raw("CONCAT(`first_name`, ' ', `last_name`)"),
+            'LIKE',
+            "%" . $request->returning_person. "%"
+        )->first();
+        // $query->orWhere(DB::raw("CONCAT(`first_name`, ' ', `last_name`)"), 'LIKE', "%" . $this->returning_person . "%");
+    // dd($prodc);
+        return response()->json($prodc);
+        // return json_encode(['products' => $products]);
+
     }
 
     public function getReceivingPerson(Request $request)
@@ -73,7 +64,7 @@ class ProductReturnController extends Controller
     {
         //
     }
-
+   
     /**
      * Show the form for creating a new resource.
      *
@@ -85,12 +76,12 @@ class ProductReturnController extends Controller
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
 
-            $product_serial_number      = ProductIntake::where('returned', '=', 0)->pluck('serial_number', 'id');
-
-
-
-
-
+            $product_serial_number      = ProductIntake::where('status', '!=', 'shopreturn')->pluck('serial_number', 'id');
+            // $product_serial_number      = ProductIntake::all()->pluck('serial_number', 'id');
+            // $product_delivery_person    = DeliveryMan::all()->pluck('first_name', 'id');
+            $product_delivery_person    = DeliveryMan::all();
+            
+            // dd($product_delivery_person);
 
             $product_model_name     = ProductService::all()->pluck('name', 'name');
             // $product_sku            = ProductService::all()->pluck('sku', 'sku');
@@ -98,12 +89,20 @@ class ProductReturnController extends Controller
             // $product_serial_no      = ProductIntake::where('returned', '=', 0)->pluck('serial_number', 'id');
             // $product_serial_no      = ProductIntake::all()->pluck('serial_number', 'id');
             $suppliers_name         = Vender::all()->pluck('name', 'name');
-            $deliveryPersons_name   = DeliveryMan::all()->pluck('name', 'name');
+            // $prodc = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS bothNames"));
+            // dd($prodc);
+            $delivery_person_concat = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
+            $delivery_person_concat2 = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact', 'id')->get();
+
+        //    $another= DeliveryMan::selectRaw("CONCAT (first_name,' ',last_name) as columns, tax_number")->pluck('columns', 'tax_number');
+            $users = DB::table('delivery_men')->select("*", DB::raw("CONCAT(delivery_men.first_name,' ',delivery_men.last_name) AS full_name"))->get();
+            // dd($delivery_person_concat);
+
             $person_receiving_in_shop      = Auth::user()->name;
             // print_r($person_receiving->name);
             // print_r($person_receiving_in_shop);
 
-            return view('productreturn.create', compact('product_model_name', 'product_imei_no', 'product_serial_number', 'suppliers_name', 'deliveryPersons_name', 'person_receiving_in_shop', 'customFields'));
+            return view('productreturn.create', compact('product_model_name', 'product_imei_no', 'product_serial_number', 'suppliers_name', 'person_receiving_in_shop', 'delivery_person_concat', 'delivery_person_concat2', 'product_delivery_person','customFields', 'users'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -122,8 +121,9 @@ class ProductReturnController extends Controller
 
         // dd($request->all());
 
+   
+
         if (\Auth::user()->can('edit product & service')) {
-            // return "Good 2";
 
             $productIntake = ProductIntake::find($request->serial_number);
 
@@ -133,21 +133,22 @@ class ProductReturnController extends Controller
                 'model_name'         => 'required',
                 'imei_number'        => 'required',
                 'serial_number'      => 'required',
-                'quantity_delivered' => 'required',
+                // 'delivery_man_id' => 'required',
+                'returning_person_id' =>'required',
+                // 'quantity_delivered' => 'required',
                 'sale_price'         => 'required',
                 'retail_price'       => 'required',
-                'returned'           => 'required',
+                // 'returned'           => 'required',
                 // 'invoice_number' => 'required',
                 'supplier_person'    => 'required',
-                'delivery_person'    => 'required',
+                // 'delivery_person'    => 'required',
+                'returning_person'    => 'required',
                 'receiving_person'   => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
-
-
                 $messages = $validator->getMessageBag();
                 return redirect()->route('productintake.index')->with('error', $messages->first());
             }
@@ -159,15 +160,19 @@ class ProductReturnController extends Controller
                 $productIntake->model_name            = $request->model_name;
                 $productIntake->imei_number           = $request->imei_number;
                 $productIntake->serial_number         = $productIntake->serial_number;
-                $productIntake->delivery_men_id       = $productIntake->delivery_men_id;
-                $productIntake->quantity_delivered    = $request->quantity_delivered;
+                $productIntake->product_service_id    = $productIntake->product_service_id;
+                $productIntake->delivery_man_id       = $productIntake->delivery_man_id;
+                $productIntake->returning_person_id   = $request->returning_person_id;
+                
+                $productIntake->quantity_delivered    = 1;
                 $productIntake->sale_price            = $request->sale_price;
                 $productIntake->retail_price          = $request->retail_price;
                 $productIntake->invoice_number        = $request->invoice_number;
-                $productIntake->returned              = $request->returned;
-                $productIntake->status                = 0;
+                $productIntake->returned              = 0;
+                $productIntake->status                = 'shopreturn';
                 $productIntake->supplier_person       = $request->supplier_person;
-                $productIntake->delivery_person       = $request->delivery_person;
+                $productIntake->delivery_person       = $productIntake->delivery_person;
+                $productIntake->returning_person       = $request->returning_person;
                 $productIntake->receiving_person      = $request->receiving_person;
                 $productIntake->created_by            = \Auth::user()->creatorId();
                 $productIntake->save();

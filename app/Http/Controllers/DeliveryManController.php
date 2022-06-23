@@ -47,6 +47,7 @@ class DeliveryManController extends Controller
 
         //  return theproductintakes();
 
+
         if (\Auth::user()->can('manage customer')) {
             $deliverypersons = DeliveryMan::where('created_by', \Auth::user()->creatorId())->get();
 
@@ -175,11 +176,14 @@ class DeliveryManController extends Controller
         $id       = \Crypt::decrypt($ids);
         $deliveryperson = DeliveryMan::find($id);
 
-        $delivered_items = ProductIntake::find($id);
-        // dd($delivered_items);
-        $returned_items = DeliveryMan::find($id);
-        // dd($deliveryperson);
-        return view('deliveryman.show', compact('deliveryperson'));
+        $delivered_items = DeliveryMan::find($id)->theproductintakes;
+        $returned_items = ProductIntake::where('returning_person_id',$id)->get();
+        // dd($returned_items);
+
+        // $returned_items=ProductIntake::select('*')->where('delivery_person','=','0728234794')->get();
+        // dd($returned_items);
+
+        return view('deliveryman.show', compact('deliveryperson', 'delivered_items', 'returned_items'));
     }
 
     /**

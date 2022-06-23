@@ -72,13 +72,23 @@ class ProductStockController extends Controller
     public function edit($id)
     {
         $productService = ProductService::find($id);
+        // $productService2 = ProductIntake::where('product_service_id', $id)->get();
+        // dd($productService2);
+
         if (\Auth::user()->can('edit product & service'))
         {
             if ($productService->created_by == \Auth::user()->creatorId())
             {
                 $status=ProductIntake::$the_status;
+
                 $keys = array_keys($status);
-                $stock_status= $keys[1];
+                $values = array_values($status);
+                // dd($values);
+
+                $stock_status= $values[1];
+
+                // $stock_status = $values[5];
+                // dd($stock_status);
                 
                 return view('productstock.edit', compact( 'productService', 'stock_status'));
             } else {

@@ -61,6 +61,7 @@ class ProposalController extends Controller
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
     }
+    
 
     public function create($customerId)
     {

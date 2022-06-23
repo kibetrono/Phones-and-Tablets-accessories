@@ -12,8 +12,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
-
-
+use App\Models\ProductIntake;
 
 class ProductServiceController extends Controller
 {
@@ -21,10 +20,24 @@ class ProductServiceController extends Controller
     public function changeStatus(Request $request, $id)
     {
 
+
+        // ProductIntake::with('productservice')->where('product_service_id', $id)->update(array('status' => $request->status));
+
+        // ProductService::with('productservice')->where('id', $id)->update(array('status' => $request->status));
+
         $status           = $request->status;
         $pro         = ProductService::find($id);
         $pro->status = $status;
         $pro->save();
+
+        if($pro->save()){
+
+        ProductIntake::with('productservice')->where('product_service_id', $id)->update(array('status' => $request->status));
+
+        }
+
+
+
         return redirect()->back();
     }
 
@@ -93,7 +106,7 @@ class ProductServiceController extends Controller
             $productService                 = new ProductService();
             $productService->name           = $request->name;
             $productService->description    = $request->description;
-            $productService->status         = 0;
+            $productService->status         = 'received';
             $productService->sku            = $request->sku;
             $productService->sale_price     = $request->sale_price;
             $productService->purchase_price = $request->purchase_price;
@@ -116,6 +129,7 @@ class ProductServiceController extends Controller
     public function edit($id)
     {
         $productService = ProductService::find($id);
+        
 
         if (\Auth::user()->can('edit product & service')) {
             if ($productService->created_by == \Auth::user()->creatorId()) {
@@ -202,12 +216,13 @@ class ProductServiceController extends Controller
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
+    
     public function export()
     {
 
         $name = 'product_service_' . date('Y-m-d i:h:s');
         $data = Excel::download(new ProductServiceExport(), $name . '.xlsx');
-
+        // dd($data);
         return $data;
     }
 

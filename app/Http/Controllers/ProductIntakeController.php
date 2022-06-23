@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DailyReport;
 use App\Models\Tax;
 use App\Models\Vender;
 use App\Models\CustomField;
@@ -12,6 +13,7 @@ use App\Models\ProductService;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ProductIntakeExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductIntakeImport;
 use App\Models\ProductServiceCategory;
 use App\Http\Requests\ProductIntakeStoreRequest;
@@ -32,11 +34,11 @@ class ProductIntakeController extends Controller
         return response()->json($prodc);
     }
 
-    public function totalRepeatedName()
+    public function totalProductsInStock()
     {
         $total = ProductIntake::groupBy('status')
         ->selectRaw('count(*) as count, status')
-        ->where('status','=','shopreturn')
+        ->where('status','=', 'instock')
         ->pluck('count');
         // return $total;
         return response()->json($total);
@@ -74,15 +76,14 @@ class ProductIntakeController extends Controller
 
         // dd($productService);
 
-
         // $it=ProductIntake::$the_status;
         // dd($it);
 
         if (\Auth::user()->can('manage product & service'))
         {
-            $productIntakes = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['returned','=',0]])->get();
+            // $productIntakes = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['returned','=',0]])->get();
+            $productIntakes = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
 
-            $productIntakes2 = ProductIntake::where('returned', '=', 1)->get();
             // $ret= $productIntakes;
             // dd($productIntakes);
             return view('productIntake.index', compact('productIntakes'));
@@ -166,6 +167,8 @@ class ProductIntakeController extends Controller
             $productIntake->supplier_person  = $request->supplier_person;
             $productIntake->delivery_person  = $request->delivery_person;
             $productIntake->receiving_person  = $request->receiving_person;
+            // $productIntake->receiving_person  = \Auth::user()->name;
+
             $productIntake->created_by      = \Auth::user()->creatorId();
             $productIntake->save();
             CustomField::saveData($productIntake, $request->customField);
@@ -206,8 +209,16 @@ class ProductIntakeController extends Controller
                 $the_supplier_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
                 $the_delivery_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('contact', 'contact');
                 // $the_receiving_person        = ::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
-                       
-                return view('productIntake.edit', compact( 'product_model_name','productIntake', 'the_supplier_person', 'the_delivery_person'));
+                
+                $del_person  = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
+                // dd($del_person);
+                $delivery_person_concat = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->get();
+                $my_delivery_person= DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
+
+                // dd($delivery_person_concat);
+
+
+                return view('productIntake.edit', compact( 'product_model_name','productIntake', 'the_supplier_person', 'the_delivery_person', 'del_person', 'delivery_person_concat', 'my_delivery_person'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
@@ -226,6 +237,7 @@ class ProductIntakeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->all());
 
         if (\Auth::user()->can('edit product & service')) {
             $productIntake = ProductIntake::find($id);
@@ -233,6 +245,7 @@ class ProductIntakeController extends Controller
                 'model_name' => 'required',
                 'imei_number' =>'required',
                 'serial_number' =>'required',
+                'product_service_id'=>'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
@@ -247,17 +260,26 @@ class ProductIntakeController extends Controller
 
                 return redirect()->route('productintake.index')->with('error', $messages->first());
             }
-                $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
+                // $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
+                $productIntake->id      = $productIntake->id;
+                $productIntake->model_name      = $request->model_name;
                 $productIntake->imei_number     = $request->imei_number;
                 $productIntake->serial_number   = $request->serial_number;
-                // $productIntake->delivery_man_id   = $request->delivery_person;
+                $productIntake->product_service_id   = $request->product_service_id;
+                $productIntake->delivery_man_id   = $request->delivery_man_id;
+                $productIntake->quantity_delivered   =  $productIntake->quantity_delivered;
             
                 $productIntake->sale_price      = $request->sale_price;
                 $productIntake->retail_price    = $request->retail_price;
                 $productIntake->invoice_number  = $request->invoice_number;
+                $productIntake->returned  = $productIntake->returned;
+                $productIntake->status          = $productIntake->status;
                 $productIntake->supplier_person  = $request->supplier_person;
                 $productIntake->delivery_person  = $request->delivery_person;
                 $productIntake->receiving_person  = $request->receiving_person;
+               $productIntake->receiving_person  = \Auth::user()->name;
+
+                $productIntake->returning_person  = $productIntake->returning_person;
                 $productIntake->created_by      = \Auth::user()->creatorId();
                 $productIntake->save();
                 CustomField::saveData($productIntake, $request->customField);
@@ -289,11 +311,17 @@ class ProductIntakeController extends Controller
         }
     }
 
+
     public function export()
     {
 
         $name = 'product_intake_' . date('Y-m-d i:h:s');
+
         $data = Excel::download(new ProductIntakeExport(), $name . '.xlsx');
+       
+        // return Excel::download(new ExportUser, 'users.xlsx');
+
+        // dd($data);
 
         return $data;
     }
