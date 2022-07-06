@@ -2,24 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\DailyReport;
 use App\Models\Tax;
 use App\Models\Vender;
 use App\Models\CustomField;
 use App\Models\DeliveryMan;
+use App\Exports\DailyReport;
 use Illuminate\Http\Request;
 use App\Models\ProductIntake;
 use App\Models\ProductService;
+use Illuminate\Validation\Rule;
 use App\Models\ProductServiceUnit;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ProductIntakeExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductIntakeImport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ProductServiceCategory;
 use App\Http\Requests\ProductIntakeStoreRequest;
 
 class ProductIntakeController extends Controller
 {
+    public function Filter_order_imei(Request $request){
+
+        // $data=ProductIntake::select('imei_number')->where('model_name',$request->the_model_name)->get();
+        $select =$request->select;
+        $value =$request->value;
+        $dependent = $request->dependent;
+        
+        $data=DB::table('product_intakes')
+        ->where($select, $value)
+        ->groupBy($dependent)
+        ->get();
+
+        // $output = '<option value="" class="select2"> Select ' . ucfirst($dependent) . '</option>';
+
+        $output='<select class="select2"><option value=""> Select ' . ucfirst($dependent) . '</option></select>';
+
+        foreach ($data as $row) {
+            $output .= '<option value="' . $row->$dependent . '">' . $row->$dependent . '</option>';
+        }
+        // echo $output; 
+
+        return response()->json($output);
+    }
+    public function getVenderId(Request $request)
+    {
+        $prodc = Vender::select('id')->where('name', $request->supplier_person)->first();
+        return response()->json($prodc);
+    }
 
     public function getDeliveyManId(Request $request)
     {
@@ -50,40 +79,19 @@ class ProductIntakeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-
-        // $prods=DeliveryMan::all();
-
-        // return view('test.index2', compact('prods'));
-
-
-        // $products = \App\Models\ProductService::with('productservice')->get();
-        // $products =ProductService::find(1);
-
-        // $ser=$products->productintake;
-        
-        // dd($ser);
-
-        // return view('test.index', compact('products'));
-
-        // $productService        = \App\Models\DeliveryMan::with('theproductintakes')->get();
-
-        // $productService        = \App\Models\ProductIntake::with('productservice')->get();
-
-
-        // $per = $productService;
-
-        // dd($productService);
-
-        // $it=ProductIntake::$the_status;
-        // dd($it);
 
         if (\Auth::user()->can('manage product & service'))
         {
-            // $productIntakes = ProductIntake::where([['created_by', '=', \Auth::user()->creatorId()],['returned','=',0]])->get();
+                
             $productIntakes = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
+            
+            if($request->has('search')){
+                
+                $productIntakes = ProductIntake::where('serial_number', 'like', "%{$request->search}%")->orWhere('imei_number', 'like', "%{$request->search}%")->get();
 
+            }
             // $ret= $productIntakes;
             // dd($productIntakes);
             return view('productIntake.index', compact('productIntakes'));
@@ -131,12 +139,11 @@ class ProductIntakeController extends Controller
 
             $rules = [
                 'model_name' => 'required',
-                'imei_number' =>'required',
-                'serial_number' =>'required',
-                'product_service_id' => 'required',
-                
+                'imei_number' => 'unique:product_intakes',
+                'serial_number' =>'unique:product_intakes',            
+                'product_service_id' => 'required',                
                 'delivery_man_id' => 'required',
-
+                'vender_id' => 'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
                 // 'invoice_number' => 'required',
@@ -155,28 +162,93 @@ class ProductIntakeController extends Controller
 
             $productIntake                  = new ProductIntake();
 
-            $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
-            $productIntake->imei_number     = $request->imei_number;
-            $productIntake->serial_number   = $request->serial_number;
+            // $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
+            $productIntake->model_name = $request->model_name;
+            if ($request->imei_number) {
+                $productIntake->imei_number     = $request->imei_number;
+            }
+            if ($request->imei_number_down) {
+                $productIntake->imei_number     = $request->imei_number_down;
+            }
+            if ($request->serial_number) {
+                $productIntake->serial_number   = $request->serial_number;
+            }
+            if ($request->serial_number_down) {
+                $productIntake->serial_number   = $request->serial_number_down;
+            }
+           
             $productIntake->product_service_id   = $request->product_service_id;
             $productIntake->delivery_man_id = $request->delivery_man_id;
+            $productIntake->vender_id = $request->vender_id;
             $productIntake->sale_price      = $request->sale_price;
             $productIntake->retail_price    = $request->retail_price;
-            $productIntake->invoice_number  = $request->invoice_number;
             $productIntake->status          = 'received';
             $productIntake->supplier_person  = $request->supplier_person;
             $productIntake->delivery_person  = $request->delivery_person;
             $productIntake->receiving_person  = $request->receiving_person;
-            // $productIntake->receiving_person  = \Auth::user()->name;
 
             $productIntake->created_by      = \Auth::user()->creatorId();
+            $time = \Carbon\Carbon::now();
+            $dateonly = date("Y-m-d", strtotime($time));
+            $productIntake->updated_at      = $dateonly;
+            
             $productIntake->save();
+
+            // return response()->json($productIntake);
+
             CustomField::saveData($productIntake, $request->customField);
 
-            return redirect()->route('productintake.index')->with('success', __('Product successfully created.'));
+            return redirect()->route('productintake.index')->with('success', __('Product(s) successfully saved.'));
         } else {
+            // $products = $request->all();
+
+
+            // return response()->json($products);
+
             return redirect()->back()->with('error', __('Permission denied.'));
         } 
+    }
+    public function storeData(Request $request)
+    {
+        //
+        $Record = new ProductIntake();
+
+        $Record->model_name = $request->model_name;
+        if ($request->imei_number) {
+            $Record->imei_number     = $request->imei_number;
+        }
+        if ($request->imei_number_down) {
+            $Record->imei_number     = $request->imei_number_down;
+        }
+        if ($request->serial_number) {
+            $Record->serial_number   = $request->serial_number;
+        }
+        if ($request->serial_number_down) {
+            $Record->serial_number   = $request->serial_number_down;
+        }
+        // $Record->imei_number = $request->imei_number_down;
+        // $Record->serial_number = $request->serial_number_down;
+        $Record->product_service_id = $request->product_service_id;
+        $Record->delivery_man_id = $request->delivery_man_id;
+        $Record->sale_price = $request->sale_price;
+        $Record->retail_price = $request->retail_price;
+        $Record->status = "received";
+        $Record->supplier_person = $request->supplier_person;
+        $Record->delivery_person = $request->delivery_person;
+        $Record->receiving_person = $request->receiving_person;
+        $Record->created_by      = \Auth::user()->creatorId();
+        $time = \Carbon\Carbon::now();
+        $dateonly = date("Y-m-d", strtotime($time));
+        $Record->updated_at      = $dateonly;
+
+        $Record->save();
+        if ($Record->save()) {
+            return response()->json(['success' => __('Product Saved.')], 200);
+            // return response()->json($Record);
+
+        } else {
+            return response()->json(['success' => __('Failed.')], 401);
+        }
     }
 
     /**
@@ -237,14 +309,24 @@ class ProductIntakeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dump($id);
         // dd($request->all());
 
         if (\Auth::user()->can('edit product & service')) {
             $productIntake = ProductIntake::find($id);
             $rules = [
                 'model_name' => 'required',
-                'imei_number' =>'required',
-                'serial_number' =>'required',
+                'imei_number' => 'unique:product_intakes,imei_number,' . $id,
+                'serial_number' => 'unique:product_intakes,serial_number,' . $id,
+
+                // 'imei_number' => [
+                //     'required',
+                //     Rule::unique('product_intakes', 'imei_number')->ignore($request->id),
+                // ],
+                // 'serial_number' => [
+                //     'required',
+                //     Rule::unique('product_intakes', 'serial_number')->ignore($request->id),
+                // ],
                 'product_service_id'=>'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
@@ -267,11 +349,11 @@ class ProductIntakeController extends Controller
                 $productIntake->serial_number   = $request->serial_number;
                 $productIntake->product_service_id   = $request->product_service_id;
                 $productIntake->delivery_man_id   = $request->delivery_man_id;
+                $productIntake->vender_id   = $request->vender_id;
                 $productIntake->quantity_delivered   =  $productIntake->quantity_delivered;
             
                 $productIntake->sale_price      = $request->sale_price;
                 $productIntake->retail_price    = $request->retail_price;
-                $productIntake->invoice_number  = $request->invoice_number;
                 $productIntake->returned  = $productIntake->returned;
                 $productIntake->status          = $productIntake->status;
                 $productIntake->supplier_person  = $request->supplier_person;
@@ -280,7 +362,11 @@ class ProductIntakeController extends Controller
                $productIntake->receiving_person  = \Auth::user()->name;
 
                 $productIntake->returning_person  = $productIntake->returning_person;
+            $time = \Carbon\Carbon::now();
+
+            $dateonly = date("Y-m-d", strtotime($time));
                 $productIntake->created_by      = \Auth::user()->creatorId();
+            $productIntake->updated_at      = $dateonly;
                 $productIntake->save();
                 CustomField::saveData($productIntake, $request->customField);
 
