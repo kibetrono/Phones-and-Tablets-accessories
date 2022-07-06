@@ -25,6 +25,7 @@ class CreateProductServicesTable extends Migration
             $table->integer('unit_id')->default('0');
             $table->string('type');
             $table->text('description')->nullable();
+            $table->integer('status')->default('0');
             $table->integer('created_by')->default('0');
             $table->timestamps();
         });

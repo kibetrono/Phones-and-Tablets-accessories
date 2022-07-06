@@ -15,11 +15,11 @@
 @endsection
 
 @section('auth-lang')
-<select class="btn btn-primary my-1 me-2 " onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" id="language">
-    @foreach(Utility::languages() as $language)
-        <option class="" @if($lang == $language) selected @endif value="{{ route('login',$language) }}">{{Str::upper($language)}}</option>
-    @endforeach
-</select>
+    <select class="btn btn-primary my-1 me-2 " onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" id="language">
+        @foreach(Utility::languages() as $language)
+            <option class="" @if($lang == $language) selected @endif value="{{ route('login',$language) }}">{{Str::upper($language)}}</option>
+        @endforeach
+    </select>
 @endsection
 
 @section('content')
@@ -62,32 +62,36 @@
         @endif
         <div class="form-group mb-4">
             @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="text-xs">{{ __('Forgot Your Password?') }}</a>
+                <a href="{{ route('password.request') }}" style="color:#0CA49D;border:unset" >{{ __('Forgot Your Password?') }}</a>
             @endif
         </div>
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-block mt-2" id="login_button">{{__('Login')}}</button>
+            <button type="submit" style="background-color:#0CA49D;border:unset" class="btn btn-primary btn-block mt-2" id="login_button">{{__('Login')}}</button>
 
         </div>
         @if($settings['enable_signup'] == 'on')
-            <p class="my-4 text-center">{{__("Don't have an account?")}} <a href="{{ route('register') }}" class="text-primary">{{__('Register')}}</a></p>
+            <p class="my-4 text-center">{{__("Don't have an account?")}} <a style="color:#0CA49D" href="{{ route('register') }}">{{__('Register')}}</a></p>
         @endif
 
         <div class="row">
             <div class="col-sm-6">
-                <a href="{{route('customer.login')}}" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('Customer Login')}}</a>
+                <a href="{{route('customer.login')}}" style="background-color:#0CA49D;border:unset" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('Customer Login')}}</a>
 
             </div>
             <div class="col-sm-6 text-end">
-                <a href="{{route('vender.login')}}" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('Vender Login')}}</a>
+                <a href="{{route('vender.login')}}" style="background-color:#0CA49D;border:unset" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('Vender Login')}}</a>
             </div>
+
+             {{-- <div class="col-sm-4 text-end">
+                <a href="" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('Delivery Person Login')}}</a>
+            </div> --}}
         </div>
 
     </div>
     {{Form::close()}}
 @endsection
 
-<script src="{{asset('js/jquery.min.js')}}"></script>
+{{-- <script src="{{asset('js/jquery.min.js')}}"></script> --}}
 <script>
     $(document).ready(function () {
         $("#form_data").submit(function (e) {

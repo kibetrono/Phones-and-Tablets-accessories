@@ -1,5 +1,7 @@
 <form method="POST" action="{{ route('customerreturns.store') }}">
                         @csrf
+ <input name="product_id" id="status_id" class="form-control" type="hidden" required readonly>              
+
 <div class="modal-body">
     <div class="row">        
 
@@ -11,7 +13,7 @@
 
                 </div>
             </div>
-        </div>
+        </div>         
 
          <div class="col-md-6">
             <div class="form-group">
@@ -31,24 +33,16 @@
             </div>
         </div>
 
-        <div style="display:none" class="col-md-6">
+        {{-- <div style="display:none" class="col-md-6">
             <div class="form-group">
                 {{ Form::label('quantity_delivered', __('Quantity Delivered'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                    <input name="quantity_delivered" value="1" class="form-control" type="hidden" required readonly>              
                 </div>
             </div>
-        </div>
+        </div> --}}
 
-         <div class="col-md-6">
-            <div class="form-group">
-                {{ Form::label('invoice_number', __('Invoice Number'),['class'=>'form-label']) }}
-                <div class="form-icon-user">
-                   <input name="invoice_number" id="invoice_number_id"  class="form-control" type="number" required readonly>              
-                </div>
-            </div>
-        </div>
-
+ 
         
                 {{-- start of customers name --}}
         <div class="col-md-6">
@@ -63,14 +57,14 @@
         {{-- end of customers name--}}
 
         {{-- start of person receiving --}}
-        <div style="display:none" class="col-md-6">
+        {{-- <div style="display:none" class="col-md-6">
             <div class="form-group">
                 {{ Form::label('receiving_person', __('Receiving Person'),['class'=>'form-label']) }}
                 <div class="form-icon-user">
                     {{ Form::hidden('receiving_person', $receiving_person,null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
             </div>
-        </div>
+        </div> --}}
         {{-- end of person receiving--}}
 
         @if(!$customFields->isEmpty())
@@ -96,7 +90,7 @@
     $(document).on('change','#choices-multiple1',function(){
         let prod_name = $(this).val();
         $.ajax({ 
-            url:'getmodelname',type: 'get',dataType: 'json',
+            url:'getproductdata',type: 'get',dataType: 'json',
             data:{'serial_number':prod_name},
             success: function(response) {if (response != null) {$('#model_name_id').val(response.model_name);}},error:function(){ }
         });      
@@ -105,7 +99,7 @@
      $(document).on('change','#choices-multiple1',function(){
         let prod_name = $(this).val();
         $.ajax({ 
-            url:'getimeinumber',type: 'get',dataType: 'json',
+            url:'getproductdata',type: 'get',dataType: 'json',
             data:{'serial_number':prod_name},
             success: function(response) {if (response != null) {$('#imei_number_id').val(response.imei_number);}},error:function(){ }
         });      
@@ -114,12 +108,35 @@
     $(document).on('change','#choices-multiple1',function(){
         let prod_name = $(this).val();
         $.ajax({ 
-            url:'getinvoicenumber',type: 'get',dataType: 'json',
+            url:'getproductdata',type: 'get',dataType: 'json',
             data:{'serial_number':prod_name},
-            success: function(response) {if (response != null) {$('#invoice_number_id').val(response.invoice_number);}},error:function(){ }
+            success: function(response) {if (response != null) {
+            }
+            },error:function(){ }
         });      
     })
 
+    $(document).on('change','#choices-multiple1',function(){
+        var input_value= $(this).val()
+
+        $.ajax({
+            url:'getproductdata',
+            type:'get',
+            dataType:'json',
+            data:{'serial_number':input_value},
+            success: function(response){
+                if(response !=null){
+                    $('#status_id').val(response.id)
+                }
+            },error:function(){
+                console.log(error);
+            }
+
+        })
+
+     })
+
 });
+   
    
 </script> 

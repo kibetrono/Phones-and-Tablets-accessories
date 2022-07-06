@@ -14,15 +14,18 @@ class ProductIntakeExport implements FromCollection, WithHeadings
         $data = ProductIntake::get();
 
         foreach ($data as $k => $ProductIntake) {
-            $taxe  = ProductIntake::Taxe($ProductIntake->tax_id);
-            $unit  = ProductIntake::productserviceunit($ProductIntake->unit_id);
-            $category  = ProductIntake::productcategory($ProductIntake->category_id);
-
-
-            unset($ProductIntake->created_by, $ProductIntake->imei_number,$ProductIntake->serial_number, $ProductIntake->updated_at, $ProductIntake->created_at);
-            $data[$k]["tax_id"]       = $taxe;
-            $data[$k]["unit_id"]       = $unit;
-            $data[$k]["category_id"]   = $category;
+            $delivery_pedrson  = ProductIntake::productdeliveryperson($ProductIntake->delivery_man_id);
+            unset($ProductIntake->product_service_id, 
+                 $ProductIntake->returning_person_id, 
+                 $ProductIntake->quantity_delivered,
+                 $ProductIntake->returned,
+                 $ProductIntake->delivery_person,
+                 $ProductIntake->returning_person,
+                 $ProductIntake->created_by,
+                 $ProductIntake->updated_at,
+                 $ProductIntake->created_at);
+           
+            $data[$k]["delivery_man_id"]   = $delivery_pedrson;
         }
 
         return $data;
@@ -32,11 +35,16 @@ class ProductIntakeExport implements FromCollection, WithHeadings
     {
         return [
             "ID",
+            "Name",
             "IMEI No.",
             "Serial No.",
-            "sale_price",
-            "Recommended sale_price",
+            "Delivery Person",
+            "Sale Price",
+            "Recommended Retail Price",
             "Invoice No.",
+            "Status",
+            "Supplier",
+            "Person Receiving ",
         ];
     }
 }

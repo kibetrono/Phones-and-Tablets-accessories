@@ -30,7 +30,7 @@ class VenderExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            "Vendor ID",
+            "Supplier ID",
             "Name",
             "Email",
             "Contact",

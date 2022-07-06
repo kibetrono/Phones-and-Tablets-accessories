@@ -179,6 +179,9 @@ return [
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
 
+        // pdf generator
+        Barryvdh\DomPDF\ServiceProvider::class,
+
     ],
 
     /*
@@ -238,6 +241,9 @@ return [
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
 		'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        // pdf
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+
     ],
 
 ];

@@ -62,6 +62,7 @@ $profile = asset(Storage::url('uploads/avatar/'));
                                 @foreach ($venders as $k => $Vender)
                                     <tr class="cust_tr" id="vend_detail">
                                         <td class="Id">
+                                            
                                             @can('show vender')
                                                 <a href="{{ route('supplier.show', \Crypt::encrypt($Vender['id'])) }}" class="btn btn-outline-primary">
                                                     {{ AUth::user()->venderNumberFormat($Vender['vender_id']) }}

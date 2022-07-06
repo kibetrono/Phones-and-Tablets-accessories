@@ -121,7 +121,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                          
+                                
+                                @foreach ($delivered_items as $item)
+                                    <tr>
+                                        <td>{{$item->model_name}}</td>
+                                        <td>{{$item->imei_number}}</td>
+                                        <td>{{$item->serial_number}}</td>
+                                        <td>{{$item->sale_price}}</td>
+                                        <td>{{$item->retail_price}}</td>
+                                        <td>{{$item->invoice_number}}</td>
+                                    </tr>
+                                @endforeach
+                       
                             </tbody>
                         </table>
                     </div>
@@ -138,11 +149,26 @@
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
-
-                                
+                                <tr role="row">
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('IMEI No.') }}</th>
+                                    <th>{{ __('Serial No.') }}</th>
+                                    <th>{{ __('Sale Price') }}</th>
+                                    <th>{{ __('Recommended Retail Price') }}</th>
+                                    <th>{{ __('Invoice No.') }}</th>
+                                </tr>
                             </thead>
                             <tbody>
-                          
+                                @foreach ($returned_items as $item)
+                                    <tr>
+                                        <td>{{$item->model_name}}</td>
+                                        <td>{{$item->imei_number}}</td>
+                                        <td>{{$item->serial_number}}</td>
+                                        <td>{{$item->sale_price}}</td>
+                                        <td>{{$item->retail_price}}</td>
+                                        <td>{{$item->invoice_number}}</td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

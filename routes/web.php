@@ -238,11 +238,13 @@ Route::prefix('customer')->as('customer.')->group(
     }
 );
 
-Route::prefix('supplier')->as('supplier.')->group(
+// Route::prefix('supplier')->as('supplier.')->group(
+Route::prefix('vender')->as('vender.')->group(
+
     function (){
-        Route::get('login/{lang}', 'Auth\AuthenticatedSessionController@showsupplierLoginLang')->name('login.lang')->middleware(['XSS']);
-        Route::get('login', 'Auth\AuthenticatedSessionController@showsupplierLoginForm')->name('login')->middleware(['XSS']);
-        Route::post('login', 'Auth\AuthenticatedSessionController@supplierLogin')->name('login')->middleware(['XSS']);
+        Route::get('login/{lang}', 'Auth\AuthenticatedSessionController@showVenderLoginLang')->name('login.lang')->middleware(['XSS']);
+        Route::get('login', 'Auth\AuthenticatedSessionController@showVenderLoginForm')->name('login')->middleware(['XSS']);
+        Route::post('login', 'Auth\AuthenticatedSessionController@venderLogin')->name('login')->middleware(['XSS']);
 
 
         Route::get('/password/resets/{lang?}', 'Auth\AuthenticatedSessionController@showVendorLinkRequestForm')->name('change.langPass');
@@ -349,7 +351,7 @@ Route::prefix('supplier')->as('supplier.')->group(
 );
 
 
-Route::get('/', 'DashboardController@index')->name('dashboard')->middleware(['XSS','revalidate',]);
+Route::get('/sss', 'DashboardController@index')->name('dashboard')->middleware(['XSS','revalidate',]);
 
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard')->middleware(
     [
@@ -451,7 +453,12 @@ Route::group(
 }
 );
 
+Route::get('stock/{id}/status/change', 'ProductServiceController@changeStatus')->name('product.status.change');
+Route::get('stock/{id}/supplier', 'ProductServiceController@getSupplier')->name('getsupplier');
 
+Route::get('proposal/{id}/status/change', 'ProposalController@statusChange')->name('proposal.status.change');
+
+Route::get('productstatus', 'ProductServiceController@productStatus');
 Route::get('productservice/index', 'ProductServiceController@index')->name('productservice.index');
 Route::resource('productservice', 'ProductServiceController')->middleware(
     [
@@ -461,7 +468,18 @@ Route::resource('productservice', 'ProductServiceController')->middleware(
 );
 
 // Product Intake 
+
+
+Route::get('getproductmodelnameid', 'ProductIntakeController@getModelNameId');
+Route::get('count', 'ProductIntakeController@totalProductsInStock');
+Route::post('productintake/filter_order_imei', 'ProductIntakeController@Filter_order_imei')->name('filter_order_imei');
+
+Route::get('getdelivery_man_id', 'ProductIntakeController@getDeliveyManId');
+Route::get('getvender_id', 'ProductIntakeController@getVenderId');
+
 Route::get('productintake/index', 'ProductIntakeController@index')->name('productintake.index');
+
+
 Route::resource('productintake', 'ProductIntakeController')->middleware(
     [
         'auth',
@@ -470,9 +488,7 @@ Route::resource('productintake', 'ProductIntakeController')->middleware(
 );
 
 // Customer Returns 
-Route::get('getmodelname', 'CustomerReturnsController@getModelName');
-Route::get('getimeinumber', 'CustomerReturnsController@getImeiNumber');
-Route::get('getinvoicenumber', 'CustomerReturnsController@getInvoiceNumber');
+Route::get('getproductdata', 'CustomerReturnsController@getproductData');
 
 Route::get('customerreturns/index', 'CustomerReturnsController@index')->name('customerreturns.index');
 Route::resource('customerreturns', 'CustomerReturnsController')->middleware(
@@ -483,6 +499,11 @@ Route::resource('customerreturns', 'CustomerReturnsController')->middleware(
 );
 
 // Product Return 
+Route::get('getproductdetails', 'ProductReturnController@getProductDetails');
+Route::get('getproductdeliveryperson', 'ProductReturnController@getDeliveryPerson');
+Route::get('getproductdeliveryperson2', 'ProductReturnController@getDeliveryPersonTwo');
+Route::get('getproductreceivingperson', 'ProductReturnController@getReceivingPerson');
+
 Route::get('productreturn/index', 'ProductReturnController@index')->name('productreturn.index');
 Route::resource('productreturn', 'ProductReturnController')->middleware(
     [
@@ -490,6 +511,18 @@ Route::resource('productreturn', 'ProductReturnController')->middleware(
         'XSS', 'revalidate',
     ]
 );
+// start of order
+
+// Route::get('order/index', 'OrderController@index')->name('order.index');
+// Route::post('order/dynamicdependent', 'OrderController@Dynamic_Dependent')->name('dynamicdependent');
+
+Route::resource('order', 'OrderController')->middleware(
+    [
+        'auth',
+        'XSS', 'revalidate',
+    ]
+);
+// end of order
 //Product Stock
 Route::resource('productstock', 'ProductStockController')->middleware(
     [
@@ -835,6 +868,15 @@ Route::group(
     Route::get('report/bill-summary', 'ReportController@billSummary')->name('report.bill.summary');
     Route::get('report/product-stock-report', 'ReportController@productStock')->name('report.product.stock.report');
 
+        // start of the daily report
+    Route::get('/report/fetchallreports', 'ReportController@dailyReportAjaxResults');
+    Route::get('/report/fetchpreviousdata', 'ReportController@previousData');  
+          
+    Route::get('report/daily-report', 'ReportController@dailyReport')->name('report.daily-report');
+    // Route::get('generate-pdf', 'ReportController@dailyReportPDF');
+
+    // end of the daily report
+
 
     Route::get('report/invoice-report', 'ReportController@invoiceReport')->name('report.invoice');
     Route::get('report/account-statement-report', 'ReportController@accountStatement')->name('report.account.statement');
@@ -1092,9 +1134,11 @@ Route::get('import/productservice/file', 'ProductServiceController@importFile')-
 Route::post('import/productservice', 'ProductServiceController@import')->name('productservice.import');
 
 // product intake
+
 Route::get('export/productintake', 'ProductIntakeController@export')->name('productintake.export');
 Route::get('import/productintake/file', 'ProductIntakeController@importFile')->name('productintake.file.import');
 Route::post('import/productintake', 'ProductIntakeController@import')->name('productintake.import');
+
 // end of product intake
 
 // Customer Returns
@@ -1109,6 +1153,12 @@ Route::post('import/customerreturns', 'CustomerReturnsController@import')->name(
 // Route::get('import/productreturn/file', 'ProductReturnController@importFile')->name('productreturn.file.import');
 // Route::post('import/productreturn', 'ProductReturnController@import')->name('productreturn.import');
 // end of product return
+
+
+// daily report export
+Route::get('/report/exportdata', 'ReportController@exportdata');
+Route::get('/report/generate-pdf', 'ReportController@dailyReportPDF');
+
 
 // delivery men
 Route::get('export/deliveryman', 'DeliveryManController@export')->name('deliveryman.export');
@@ -1138,6 +1188,7 @@ Route::get('/config-clear', function() {
     $exitCode = Artisan::call('config:clear');
     return '<h1>Clear Config cleared</h1>';
 });
+
 
 // ------------------------------------- PaymentWall ------------------------------
 

@@ -7,6 +7,8 @@
         $(document).on('change', '.status_change', function () {
             var status = this.value;
             var url = $(this).data('url');
+            // alert(url);
+
             $.ajax({
                 url: url + '?status=' + status,
                 type: 'GET',
@@ -14,6 +16,7 @@
                 success: function (data) {
                 },
             });
+            
         });
 
         $('.cp_link').on('click', function () {
@@ -100,6 +103,7 @@
                                         @endif
                                     </small>
                                     <br>
+
                                     <div class="float-right mt-2 col-md-3 float-end ml-5" data-toggle="tooltip" data-original-title="{{__('Click to change status')}}">
                                         <select class="form-control status_change select2" name="status" data-url="{{route('proposal.status.change',$proposal->id)}}">
                                             @foreach($status as $k=>$val)

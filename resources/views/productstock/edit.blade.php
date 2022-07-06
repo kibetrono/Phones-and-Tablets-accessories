@@ -12,6 +12,11 @@
             {{$productService->sku}}
 
         </div>
+ {{-- <div class="form-group col-md-4">
+            {{ Form::label('Supplier', __('Supplier'),['class'=>'form-label']) }}<br>
+            {{$productService->sku}}
+
+        </div> --}}
 
         <div class="form-group quantity">
             <div class="d-flex radio-check ">
@@ -35,7 +40,8 @@
         <p class="btn btn-primary status_change" data-url="{{route('product.status.change',$productService->id)}}">Sync Product</p>
         </div>
         <div class="form-group col-md-6" id="msg" style="display: none">
-            <h5 class="pt-3" style="color:green">Status changed</h5>
+            {{-- <h5 class="pt-3" style="color:green">Status changed</h5> --}}
+            <input type="text" style="border: unset" class="form-control" id="totalnum">
         </div>
 
 
@@ -59,20 +65,66 @@
 
 @endforeach
 </select> --}}
+{{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> --}}
+
 <script>
-    $(document).on('click', '.status_change', function () {
+
+    $(document).ready(function(){
+        var id="<?php echo $productService->id ?>"
+
+        // alert(id)
+        $.ajax({
+
+            url:'getsupplier',
+            data:{},
+            dataType,
+            success:function(response){
+                if(response != null){
+                    console.log("Response",response);
+                }
+            },error:function(error){
+                console.log("The Error",error);
+            }
+        });
+    })
+    $(document).on('click', '.status_change', function ()
+     {
             var status ='<?php echo $stock_status ?>';
                 
             var url = $(this).data('url');
+
             $.ajax({
                 url: url + '?status=' + status,
+                
                 type: 'GET',
                 cache: false,
                 success: function (data) {
-                    $('#msg').show().delay(1000).fadeOut(2000)
+                    // $('#msg').show().delay(1000).fadeOut(2000)
+                },error: function(errs){
+
+
                 },
             });
         });
+
+    $(document).on('click','.status_change',function(){
+        $.ajax({
+                url: 'count',
+                type: 'GET',
+                cache:false,
+                success: function(response) {
+                    if (response != null) {
+                        // console.log("Response",response);
+                    // $('#msg').show().delay(1000).fadeOut(5000)
+                    $('#msg').css('display','block')
+
+                        $('#totalnum').val(response[0] + " products in stock.");
+
+                        // console.log(response[0]);
+                    }
+                },
+                error: function() {}
+            });    })
 
 
 </script>

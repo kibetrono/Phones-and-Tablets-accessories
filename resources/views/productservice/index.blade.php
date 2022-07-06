@@ -18,7 +18,7 @@
         </a>
         <a href="{{route('productservice.export')}}" data-bs-toggle="tooltip" title="{{__('Export')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-file-export"></i>
-        </a>
+        </a>       
 
        <a href="#" data-size="lg" data-url="{{ route('productservice.create') }}" data-ajax-popup="true" data-bs-toggle="tooltip" title="{{__('Create')}}" data-title="{{__('Create Product')}}" class="btn btn-sm btn-primary">
             <i class="ti ti-plus"></i>
@@ -80,6 +80,7 @@
                                 <th>{{__('Unit')}}</th>
                                 <th>{{__('Quantity')}}</th>
                                 <th>{{__('Type')}}</th>
+                                {{-- <th>{{__('Status')}}</th> --}}
                                 <th>{{__('Action')}}</th>
                             </tr>
                             </thead>
@@ -107,6 +108,7 @@
                                     <td>{{ !empty($productService->unit())?$productService->unit()->name:'' }}</td>
                                     <td>{{$productService->quantity}}</td>
                                     <td>{{ $productService->type }}</td>
+                                    {{-- <td>{{ $productService->status }}</td> --}}
 
                                     @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
                                         <td class="Action">

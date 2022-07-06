@@ -65,14 +65,6 @@
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="form-group">
-                {{ Form::label('name', __('Invoice Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
-                <div class="form-icon-user">
-                    {{ Form::text('invoice_number',null, array('class' => 'form-control')) }}
-                </div>
-            </div>            
-        </div>
 
     </div>
 </div>

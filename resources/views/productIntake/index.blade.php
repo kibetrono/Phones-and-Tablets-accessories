@@ -75,8 +75,10 @@
                                 <th>{{ __('Serial No.') }}</th>
                                 <th>{{ __('Sale Price') }}</th>
                                 <th>{{ __('Recommended Retail Price') }}</th>
-                                <th>{{ __('Invoice No.') }}</th>
-                                <th>{{ __('Status') }}</th>
+                                <th>{{ __('Supplier') }}</th>
+                                {{-- <th style="color:yellow">{{ __('First Name') }}</th>
+                                <th style="color:red">{{ __('First Name') }}</th>
+                                 <th>{{ __('Status') }}</th> --}}
                                  <th>{{ __('Action') }}</th>
                             </tr>
                             </thead>
@@ -89,8 +91,13 @@
                                     <td>{{ $productIntake->serial_number }}</td>
                                     <td>{{ $productIntake->sale_price }}</td>
                                     <td>{{ $productIntake->retail_price }}</td>
-                                    <td>{{ $productIntake->invoice_number }}</td>
-                                    <td>
+                                    <td>{{ $productIntake->supplier_person }}</td>
+                                    {{-- <td style="color:yellow">{{ $productIntake->productservice->name}}</td>
+                                    <td style="color:red">{{ $productIntake->deliveryman->first_name }} {{$productIntake->deliveryman->last_name}}</td>
+                                    <td style="color:blue">{{ $productIntake->status }} </td> --}}
+                                    
+                                    {{-- specName --}}
+                                    {{-- <td>
                                         @if($productIntake->status == 0)
                                             <span class="badge bg-primary p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
                                         @elseif($productIntake->status == 1)
@@ -102,7 +109,7 @@
                                         @elseif($productIntake->status == 4)
                                             <span class="badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
                                         @endif
-                                    </td>
+                                    </td> --}}
                                     <td class="Action">
                                   
                                     @can('edit customer')
@@ -132,3 +139,5 @@
         </div>
     </div>
 @endsection
+
+

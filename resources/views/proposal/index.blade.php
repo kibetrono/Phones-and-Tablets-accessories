@@ -137,6 +137,7 @@
                                             <span class="badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\Proposal::$statues[$proposal->status]) }}</span>
                                         @endif
                                     </td>
+                                    
                                     @if(Gate::check('edit proposal') || Gate::check('delete proposal') || Gate::check('show proposal'))
                                         <td class="Action">
                                             @if($proposal->is_convert==0)

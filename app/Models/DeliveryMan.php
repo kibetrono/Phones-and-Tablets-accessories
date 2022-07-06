@@ -37,8 +37,13 @@ class DeliveryMan extends Authenticatable
     public $settings;
 
     public function theproductintakes(){
-        return $this->hasMany(ProductIntake::class);
+
+        return $this->hasMany(ProductIntake::class,"delivery_man_id",'id');
     }
+
+    // public function specName(){
+    //     return $this->hasOne(ProductIntake::class);
+    // }
 
     public function authId()
     {

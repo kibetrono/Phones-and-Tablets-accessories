@@ -46,7 +46,6 @@
                                     <th> {{__('Product Name')}}</th>
                                     <th> {{__('IMEI NO.')}}</th>
                                     <th> {{__('SERIAL NO.')}}</th>
-                                    <th> {{__('INVOICE NO.')}}</th>
                                     <th> {{__('CUSTOMERS NAME')}}</th>
                                     <th>{{__('Action')}}</th>
                                 </tr>
@@ -61,7 +60,6 @@
                                     <td>{{$cust_returns['imei_number']}}</td>
                                     <td>{{$cust_returns['serial_number']}}</td>
 
-                                    <td>{{$cust_returns['invoice_number']}}</td>
                                     <td>{{$cust_returns['returning_customer']}}</td>
                                    
                                     <td class="Action">

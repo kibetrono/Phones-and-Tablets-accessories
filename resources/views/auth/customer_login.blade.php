@@ -31,7 +31,7 @@
     @csrf
     <div class="">
         <div class="form-group mb-3">
-            <label for="email" class="form-label">{{__('Enter Email address')}}</label>
+            <label for="email" class="form-lEnter Email addressabel">{{__('Enter Email address for')}}</label>
             <input class="form-control @error('email') is-invalid @enderror" id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
             @error('email')
             <div class="invalid-feedback" role="alert">{{ $message }}</div>
@@ -57,7 +57,7 @@
             </div>
         @endif
         <div class="form-group mb-4">
-            <a href="{{ route('customer.change.langPass') }}" class="text-xs">{{ __('Forgot Your Password?') }}</a>
+            <a href="{{ route('customer.change.langPass') }}" style="color:#0CA49D" class="text-xs">{{ __('Forgot Your Password?') }}</a>
 
         </div>
         <div class="d-grid">
@@ -68,7 +68,7 @@
 
         <div class="row">
             <div class="col-sm-6">
-                <a href="{{route('login')}}" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('User Login')}}</a>
+                <a href="/" class="btn-login btn btn-primary btn-block mt-2 text-white">{{__('User Login')}}</a>
 
             </div>
             <div class="col-sm-6 text-end">

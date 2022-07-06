@@ -323,6 +323,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        
                                         {{ Form::label('category_id', __('Category'),['class'=>'form-label']) }}
                                         {{ Form::select('category_id', $category,null, array('class' => 'form-control select','required'=>'required')) }}
                                     </div>

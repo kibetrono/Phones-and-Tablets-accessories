@@ -222,7 +222,7 @@
                     <li class="dash-item {{ (Request::segment(1) == 'proposal')?'active':''}}">
                         <a href="{{ route('proposal.index') }}" class="dash-link ">
                             <span class="dash-micon"><i class="ti ti-receipt"></i></span>
-                            <span class="dash-mtext">{{__('Proposal')}}</span>
+                            <span class="dash-mtext">{{__('Quotation')}}</span>
                         </a>
                     </li>
                 @endif
@@ -465,6 +465,14 @@
                                     <a class="dash-link" href="{{route('report.product.stock.report')}}">{{ __('Product Stock') }}</a>
                                 </li>
                             @endcan
+
+                            <li class="dash-item {{ (Request::route()->getName() == 'report.daily-report' ) ? ' active' : '' }}">
+                                    <a class="dash-link" href="{{route('report.daily-report')}}">{{ __('Daily Report') }}</a>
+                                </li>
+
+                            {{-- <li>
+                                report.daily-report
+                            </li> --}}
 
 
                         </ul>

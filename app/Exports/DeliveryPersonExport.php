@@ -27,7 +27,8 @@ class DeliveryPersonExport implements FromCollection
     {
         return [
             "Delivery Person Id",
-            "Name",
+            "First Name",
+            "Last Name",
             "Email",
             "Contact",
         ];

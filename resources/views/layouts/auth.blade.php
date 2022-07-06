@@ -39,7 +39,7 @@
         <nav class="navbar navbar-expand-md navbar-light default">
             <div class="container-fluid pe-2">
                 <a class="navbar-brand" href="#">
-                    <img src="{{ asset('assets/images/logo-dark.png') }}" alt="logo"/>
+                    <img src="{{ asset('assets/images/4-logo-dark.png') }}" alt="logo"/>
                 </a>
                 <button
                     class="navbar-toggler"
@@ -66,7 +66,7 @@
                         </li>
 
                         <li class="nav-item ">
-                           @yield('auth-lang')
+                           {{-- @yield('auth-lang') --}}
                         </li>
                     </ul>
 
@@ -104,7 +104,7 @@
                 <div class="row">
                     <div class="col-6 ">
                         <p class="">
-                            {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright ERPGO') }} {{ date('Y') }}
+                            {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright SoftwaresKe') }} {{ date('Y') }}
                         </p>
                     </div>
                 </div>

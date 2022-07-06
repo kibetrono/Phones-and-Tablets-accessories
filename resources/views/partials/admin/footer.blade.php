@@ -1,9 +1,14 @@
+
+
+
+
 <!-- [ Main Content ] end -->
 <footer class="dash-footer">
     <div class="footer-wrapper">
         <div class="py-1">
-            <span class="text-muted">  {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright AccountGo SaaS') }} {{ date('Y') }}</span>
+            <span class="text-muted">  {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright SoftwaresKe') }} {{ date('Y') }}</span>
         </div>
+     
         <div class="py-1">
     {{--            <ul class="list-inline m-0">--}}
     {{--                <li class="list-inline-item">--}}
@@ -21,8 +26,14 @@
     {{--            </ul>--}}
         </div>
     </div>
+ 
 </footer>
+    @if (Route::current()->getName() == 'productintake.index')
+<script  src="{{ asset('assets/js/plugins/productintake-simple-datatables.js') }}"></script>
 
+        @else
+<script  src="{{ asset('assets/js/plugins/simple-datatables.js') }}"></script>
+        @endif
 
 
 <!-- Warning Section Ends -->
@@ -39,7 +50,8 @@
 <script src="{{ asset('assets/js/plugins/choices.min.js') }}"></script>
 
 <script src="{{ asset('assets/js/plugins/sweetalert2.all.min.js') }}"></script>
-<script src="{{ asset('assets/js/plugins/simple-datatables.js') }}"></script>
+ 
+
 
 <!-- sweet alert Js -->
 {{--<script src="{{ asset('assets/js/plugins/sweetalert.min.js') }}"></script>--}}
@@ -127,4 +139,5 @@
             }
         }
     }
+    
 </script>

@@ -102,7 +102,7 @@
         @endif
     </ul>
 </div>
-            <div class="ms-auto">
+            {{-- <div class="ms-auto">
               <ul class="list-unstyled">
                 <li class="dropdown dash-h-item drp-language">
                     <a
@@ -127,7 +127,7 @@
                     </div>
                 </li>
               </ul>
-</div>
+            </div> --}}
 
 </div>
 </header>

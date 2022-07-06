@@ -75,7 +75,6 @@
                                 <th>{{ __('Serial No.') }}</th>
                                 <th>{{ __('Sale Price') }}</th>
                                 <th>{{ __('Recommended Retail Price') }}</th>
-                                <th>{{ __('Invoice No.') }}</th>
                                  <th>{{ __('Action') }}</th>
                             </tr>
                             </thead>
@@ -88,7 +87,6 @@
                                     <td>{{ $productIntake->serial_number }}</td>
                                     <td>{{ $productIntake->sale_price }}</td>
                                     <td>{{ $productIntake->retail_price }}</td>
-                                    <td>{{ $productIntake->invoice_number }}</td>
                                     <td class="Action">
                                   
                                     @can('edit customer')

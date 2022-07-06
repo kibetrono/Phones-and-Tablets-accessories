@@ -82,7 +82,7 @@
         <div class="d-grid">
             <button type="submit" class="btn-login btn btn-primary btn-block mt-2" id="login_button">{{__('Register')}}</button>
         </div>
-        <p class="my-4 text-center">{{__("Already' have an account?")}} <a href="{{ route('login') }}" class="text-primary">{{__('Login')}}</a></p>
+        <p class="my-4 text-center">{{__("Already' have an account?")}} <a href="/" class="text-primary">{{__('Login')}}</a></p>
 
     </div>
     {{Form::close()}}

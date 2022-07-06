@@ -18,6 +18,13 @@ class ProductService extends Model
         'created_by',
     ];
 
+
+    public function productintake()
+    {
+        return $this->hasMany(ProductIntake::class, 'product_service_id', 'id');
+    }
+
+
     public function taxes()
     {
         return $this->hasOne('App\Models\Tax', 'id', 'tax_id')->first();
@@ -97,10 +104,14 @@ class ProductService extends Model
     public static function productcategory($category)
     {
         $categoryArr  = explode(',', $category);
+        // dd($categoryArr);
         $categoryRate = 0;
         foreach ($categoryArr as $category) {
             $category    = ProductServiceCategory::find($category);
+            // dd($category);
             $categoryRate        = isset($category) ? $category->name : '';
+
+            // dd($categoryRate);
         }
 
         return $categoryRate;

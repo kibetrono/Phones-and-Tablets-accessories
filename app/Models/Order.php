@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Order extends Model
 {
@@ -23,6 +24,16 @@ class Order extends Model
         'receipt',
         'user_id',
     ];
+
+    // public function getCreatedAtAttribute($date)
+    // {
+    //     return Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+    // }
+
+    // public function getUpdatedAtAttribute($date)
+    // {
+    //     return Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d');
+    // }
 
     public static function total_orders()
     {
