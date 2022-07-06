@@ -14,12 +14,9 @@ class CustomerReturnsController extends Controller
     public function getproductData(Request $request)
     {        
         $prodc = ProductIntake::select('id','model_name', 'imei_number', 'invoice_number', 'status')
-        ->where('serial_number', $request->serial_number)->first();
+        ->where('id', $request->serial_number)->first();
         return response()->json($prodc);
     }
-
-
-
 
 
     /**
@@ -49,8 +46,10 @@ class CustomerReturnsController extends Controller
     {
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            $status= 'custreturn';
-            $product_serial_number      = ProductIntake::where('status', '!=', $status)->pluck('serial_number', 'serial_number')->toArray();
+            // $status= 'custreturn';
+            // $product_serial_number      = ProductIntake::where('status', '!=', $status)->pluck('serial_number', 'serial_number')->toArray();
+            $product_serial_number      = ProductIntake::where('status', '!=', 'custreturn')->pluck('serial_number', 'id');
+
             $returning_customer         = Customer::all()->pluck('name', 'name')->toArray();
             $receiving_person           = \Auth::user()->name;
         
@@ -161,8 +160,16 @@ class CustomerReturnsController extends Controller
      * @param  \App\Models\CustomerReturns  $customerReturns
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerReturns $customerReturns)
+    public function destroy($id)
     {
-        //
+        if (\Auth::user()->can('delete product & service')) {
+            $cust_return = CustomerReturns::find($id);
+
+            $cust_return->delete();
+
+            return redirect()->route('customerreturns.index')->with('success', __('Product successfully deleted.'));
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
     }
 }
