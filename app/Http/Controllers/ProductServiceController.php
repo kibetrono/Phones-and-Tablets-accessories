@@ -19,26 +19,27 @@ class ProductServiceController extends Controller
 
     public function changeStatus(Request $request, $id)
     {
-
-
-        // ProductIntake::with('productservice')->where('product_service_id', $id)->update(array('status' => $request->status));
-
-        // ProductService::with('productservice')->where('id', $id)->update(array('status' => $request->status));
-
         $status           = $request->status;
         $pro         = ProductService::find($id);
         $pro->status = $status;
         $pro->save();
 
         if($pro->save()){
-
-        ProductIntake::with('productservice')->where('product_service_id', $id)->update(array('status' => $request->status));
+            $time = \Carbon\Carbon::now();
+            $dateonly = date("Y-m-d", strtotime($time));
+        ProductIntake::with('productservice')->where('product_service_id', $id)->update(array('status' => $request->status,'updated_at'=> $dateonly));
 
         }
 
-
-
         return redirect()->back();
+    }
+
+    public function getSupplier(Request $request, $id){
+        // dd($id);
+        $data =ProductIntake::with('productservice')->where('product_service_id', $id)->get();
+
+        dump($data);
+
     }
 
     public function index(Request $request)
@@ -115,7 +116,10 @@ class ProductServiceController extends Controller
             $productService->quantity        = $request->quantity;
             $productService->type           = $request->type;
             $productService->category_id    = $request->category_id;
+            $time = \Carbon\Carbon::now();
+            $dateonly = date("Y-m-d", strtotime($time));
             $productService->created_by     = \Auth::user()->creatorId();
+            $productService->updated_at     = $dateonly;
             $productService->save();
             CustomField::saveData($productService, $request->customField);
 
@@ -187,7 +191,10 @@ class ProductServiceController extends Controller
                 $productService->quantity        = $request->quantity;
                 $productService->type           = $request->type;
                 $productService->category_id    = $request->category_id;
+                $time = \Carbon\Carbon::now();
+                $dateonly = date("Y-m-d", strtotime($time));
                 $productService->created_by     = \Auth::user()->creatorId();
+                $productService->updated_at     = $dateonly;
                 $productService->save();
                 CustomField::saveData($productService, $request->customField);
 

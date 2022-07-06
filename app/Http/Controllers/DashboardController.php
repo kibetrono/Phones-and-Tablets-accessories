@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BalanceSheet;
-use App\Models\BankAccount;
+use App\Models\Tax;
 use App\Models\Bill;
 use App\Models\Goal;
-use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\Payment;
 use App\Models\Plan;
-use App\Models\ProductServiceCategory;
-use App\Models\ProductServiceUnit;
-use App\Models\Projects;
+use App\Models\Order;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Revenue;
-use App\Models\Tax;
 use App\Models\Utility;
+use App\Models\Projects;
+use App\Models\BankAccount;
+use App\Models\BalanceSheet;
+use App\Models\ProductIntake;
+use App\Models\ProductServiceUnit;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProductServiceCategory;
 
 class DashboardController extends Controller
 {
@@ -111,6 +113,11 @@ class DashboardController extends Controller
                     $data['monthlyBill']       = \Auth::user()->monthlyBill();
                     $data['goals']             = Goal::where('created_by', '=', \Auth::user()->creatorId())->where('is_display', 1)->get();
 
+
+                    $wordlist = ProductIntake::where('status', '=', 'received')->get();
+
+                        $data['received'] =count($wordlist);
+                        
 
                 }
                 else

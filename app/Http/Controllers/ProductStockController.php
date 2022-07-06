@@ -72,6 +72,8 @@ class ProductStockController extends Controller
     public function edit($id)
     {
         $productService = ProductService::find($id);
+        // dd($productService);
+        // $productIntake = ProductIntake::find($id);
         // $productService2 = ProductIntake::where('product_service_id', $id)->get();
         // dd($productService2);
 
@@ -85,7 +87,7 @@ class ProductStockController extends Controller
                 $values = array_values($status);
                 // dd($values);
 
-                $stock_status= $values[1];
+                $stock_status= $values[2];
 
                 // $stock_status = $values[5];
                 // dd($stock_status);
@@ -126,6 +128,9 @@ class ProductStockController extends Controller
             {
                 $productService->quantity        = $total;
                 $productService->created_by     = \Auth::user()->creatorId();
+                $time = \Carbon\Carbon::now();
+                $dateonly = date("Y-m-d", strtotime($time));
+                $productService->updated_at      = $dateonly;
                 $productService->save();
 
                 //Product Stock Report

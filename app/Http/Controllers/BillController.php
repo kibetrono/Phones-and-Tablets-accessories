@@ -74,8 +74,10 @@ class BillController extends Controller
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $product_services->prepend('--', '');
 
+
             return view('bill.create', compact('venders', 'bill_number', 'product_services', 'category', 'customFields', 'vendorId'));
         } else {
+            
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -83,6 +85,8 @@ class BillController extends Controller
 
     public function store(Request $request)
     {
+
+        // dd($request->all());
         if (\Auth::user()->can('create bill')) {
             $validator = \Validator::make(
                 $request->all(),

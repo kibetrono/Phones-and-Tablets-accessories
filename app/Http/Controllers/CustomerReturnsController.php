@@ -99,7 +99,6 @@ class CustomerReturnsController extends Controller
             $customerReturns->imei_number     = $request->imei_number;
             $customerReturns->serial_number   = $request->serial_number;
             $customerReturns->quantity_delivered   = 1;
-            $customerReturns->invoice_number  = $request->invoice_number;
             $customerReturns->returning_customer  = $request->returning_customer;
             $customerReturns->receiving_person  =\Auth::user()->name;
             $customerReturns->created_by      = \Auth::user()->creatorId();
@@ -107,8 +106,11 @@ class CustomerReturnsController extends Controller
             CustomField::saveData($customerReturns, $request->customField);
 
             if($customerReturns->save()){
+                $time = \Carbon\Carbon::now();
 
-           ProductIntake::where('id',$request->product_id)->update(array('status'=>'custreturn'));
+                $dateonly = date("Y-m-d", strtotime($time));
+
+           ProductIntake::where('id',$request->product_id)->update(array('status'=>'custreturn','updated_at'=> $dateonly));
 
             };
 

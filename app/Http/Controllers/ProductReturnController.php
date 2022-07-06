@@ -154,7 +154,9 @@ class ProductReturnController extends Controller
             }
 
             if ($productIntake->created_by == \Auth::user()->creatorId()) {
+                $time = \Carbon\Carbon::now();
 
+                $dateonly = date("Y-m-d", strtotime($time));
 
                 $productIntake->id                    = $productIntake->id;
                 $productIntake->model_name            = $request->model_name;
@@ -167,7 +169,6 @@ class ProductReturnController extends Controller
                 $productIntake->quantity_delivered    = 1;
                 $productIntake->sale_price            = $request->sale_price;
                 $productIntake->retail_price          = $request->retail_price;
-                $productIntake->invoice_number        = $request->invoice_number;
                 $productIntake->returned              = 0;
                 $productIntake->status                = 'shopreturn';
                 $productIntake->supplier_person       = $request->supplier_person;
@@ -175,6 +176,7 @@ class ProductReturnController extends Controller
                 $productIntake->returning_person       = $request->returning_person;
                 $productIntake->receiving_person      = $request->receiving_person;
                 $productIntake->created_by            = \Auth::user()->creatorId();
+                $productIntake->updated_at            = $dateonly;
                 $productIntake->save();
 
 

@@ -16,6 +16,28 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    public function Dynamic_Dependent(Request $request)
+    {
+        $select=$request->get('select');
+        $value = $request->get('value');;
+        $dependent=$request->get('dependent');;
+
+        $data=DB::table('product_intakes')
+        ->where($select, $value)
+        ->groupBy($dependent)
+        ->get();
+        
+
+        $output='<option value=""> Select '.ucfirst($dependent). '</option>';
+
+        foreach($data as $row){
+            $output .= '<option value="'.$row->$dependent. '">' .$row->$dependent . '</option>';
+        }
+        // echo $output; 
+
+        return response()->json($output);
+
+    }
     /**
      * Display a listing of the resource.
      *
@@ -24,6 +46,10 @@ class OrderController extends Controller
     public function index()
     {
         //
+       $alldata=DB::table('product_intakes')->groupBy('model_name')->get();
+        // $alldata = ProductIntake::all();
+        
+       return view('order.dynamic_dependent',compact('alldata'));
     }
 
     /**
@@ -33,6 +59,9 @@ class OrderController extends Controller
      */
     public function create()
     {
+
+
+        
         // $planID  = \Illuminate\Support\Facades\Crypt::decrypt($plan);
         // $plan    = Plan::find($planID);
         
@@ -73,7 +102,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         //
-        // dd($request->all());
+        dd($request->all());
 
         if(\Auth::user()){
 
@@ -120,7 +149,12 @@ class OrderController extends Controller
             $order->save();
 
             if($order->save()){
-                ProductIntake::Where('imei_number',$request->imei_number)->update(array('status'=>'sold'));
+
+                $time = \Carbon\Carbon::now();
+
+                $dateonly = date("Y-m-d", strtotime($time));
+
+                ProductIntake::Where('imei_number',$request->imei_number)->update(array('status'=>'sold','updated_at'=> $dateonly));
 
               $prod= ProductService::Where('name', $request->model_name)->first();
         
