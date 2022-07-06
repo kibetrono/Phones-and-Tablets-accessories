@@ -1,5 +1,6 @@
 <form method="POST" action="{{ route('customerreturns.store') }}">
                         @csrf
+
  <input name="product_id" id="status_id" class="form-control" type="hidden" required readonly>              
 
 <div class="modal-body">
@@ -9,7 +10,9 @@
             <div class="form-group">
                 {{ Form::label('serial_number', __('Serial Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
-                  {{ Form::select('serial_number', array_merge(['' => "Select Serial Number"] + $product_serial_number),null, array('class' => 'form-control select2','id'=>'choices-multiple1','required'=>'required')) }}
+                  {{-- {{ Form::select('serial_number', array_merge(['' => "Select Serial Number"] + $product_serial_number),null, array('class' => 'form-control select2','id'=>'choices-multiple1','required'=>'required')) }} --}}
+                   {{ Form::select('serial_number',$product_serial_number,null, array('class' => 'form-control select2','id'=>'choices-multiple1','required'=>'required','placeholder'=>'Select Serial Number')) }}
+
 
                 </div>
             </div>
@@ -89,52 +92,61 @@
  $(document).ready(function(){
     $(document).on('change','#choices-multiple1',function(){
         let prod_name = $(this).val();
-        $.ajax({ 
-            url:'getproductdata',type: 'get',dataType: 'json',
-            data:{'serial_number':prod_name},
-            success: function(response) {if (response != null) {$('#model_name_id').val(response.model_name);}},error:function(){ }
-        });      
-    })
-
-     $(document).on('change','#choices-multiple1',function(){
-        let prod_name = $(this).val();
-        $.ajax({ 
-            url:'getproductdata',type: 'get',dataType: 'json',
-            data:{'serial_number':prod_name},
-            success: function(response) {if (response != null) {$('#imei_number_id').val(response.imei_number);}},error:function(){ }
-        });      
-    })
-
-    $(document).on('change','#choices-multiple1',function(){
-        let prod_name = $(this).val();
+        console.log(prod_name);
         $.ajax({ 
             url:'getproductdata',type: 'get',dataType: 'json',
             data:{'serial_number':prod_name},
             success: function(response) {if (response != null) {
+                console.log("Results",response);
+                
+                $('#model_name_id').val(response.model_name);
+                $('#imei_number_id').val(response.imei_number);
+                $('#status_id').val(response.id)
+
             }
-            },error:function(){ }
+        },error:function(){ }
         });      
     })
 
-    $(document).on('change','#choices-multiple1',function(){
-        var input_value= $(this).val()
+    //  $(document).on('change','#choices-multiple1',function(){
+    //     let prod_name = $(this).val();
+    //     $.ajax({ 
+    //         url:'getproductdata',type: 'get',dataType: 'json',
+    //         data:{'serial_number':prod_name},
+    //         success: function(response) {if (response != null) {$('#imei_number_id').val(response.imei_number);}},error:function(){ }
+    //     });      
+    // })
 
-        $.ajax({
-            url:'getproductdata',
-            type:'get',
-            dataType:'json',
-            data:{'serial_number':input_value},
-            success: function(response){
-                if(response !=null){
-                    $('#status_id').val(response.id)
-                }
-            },error:function(){
-                console.log(error);
-            }
+    // $(document).on('change','#choices-multiple1',function(){
+    //     let prod_name = $(this).val();
+    //     $.ajax({ 
+    //         url:'getproductdata',type: 'get',dataType: 'json',
+    //         data:{'serial_number':prod_name},
+    //         success: function(response) {if (response != null) {
+    //         }
+    //         },error:function(){ }
+    //     });      
+    // })
 
-        })
+    // $(document).on('change','#choices-multiple1',function(){
+    //     var input_value= $(this).val()
 
-     })
+    //     $.ajax({
+    //         url:'getproductdata',
+    //         type:'get',
+    //         dataType:'json',
+    //         data:{'serial_number':input_value},
+    //         success: function(response){
+    //             if(response !=null){
+    //                 $('#status_id').val(response.id)
+    //             }
+    //         },error:function(){
+    //             console.log(error);
+    //         }
+
+    //     })
+
+    // })
 
 });
    
