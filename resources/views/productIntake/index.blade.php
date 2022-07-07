@@ -73,8 +73,9 @@
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('IMEI No.') }}</th>
                                 <th>{{ __('Serial No.') }}</th>
-                                <th>{{ __('Sale Price') }}</th>
+                                <th>{{ __('Supplier Price') }}</th>
                                 <th>{{ __('Recommended Retail Price') }}</th>
+                                <th>{{ __('Color') }}</th>
                                 <th>{{ __('Supplier') }}</th>
                                 {{-- <th style="color:yellow">{{ __('First Name') }}</th>
                                 <th style="color:red">{{ __('First Name') }}</th>
@@ -91,6 +92,7 @@
                                     <td>{{ $productIntake->serial_number }}</td>
                                     <td>{{ $productIntake->sale_price }}</td>
                                     <td>{{ $productIntake->retail_price }}</td>
+                                    <td>{{ $productIntake->color }}</td>
                                     <td>{{ $productIntake->supplier_person }}</td>
                                     {{-- <td style="color:yellow">{{ $productIntake->productservice->name}}</td>
                                     <td style="color:red">{{ $productIntake->deliveryman->first_name }} {{$productIntake->deliveryman->last_name}}</td>
@@ -110,9 +112,11 @@
                                             <span class="badge bg-danger p-2 px-3 rounded">{{ __(\App\Models\productIntake::$the_status[$productIntake->status]) }}</span>
                                         @endif
                                     </td> --}}
+
+                                        
                                     <td class="Action">
                                   
-                                    @can('edit customer')
+                                    @can('edit product & service')
                                         <div class="action-btn bg-primary ms-2">
                                             <a data-size="md" href="#" class="mx-3 btn btn-sm d-inline-flex align-items-center" data-url="{{ route('productintake.edit', $productIntake->id) }}" data-ajax-popup="true"  data-size="xl" data-bs-toggle="tooltip" title="{{__('Update')}}">
                                                 <i class="ti ti-pencil text-white"></i>
@@ -120,7 +124,7 @@
                                         </div>
                                      @endcan
 
-                                    @can('delete customer')
+                                    @can('delete product & service')
                                     <div class="action-btn bg-danger ms-2">
                                         {!! Form::open(['method' => 'DELETE', 'route' => ['productintake.destroy', $productIntake['id']],'id'=>'delete-form-'.$productIntake['id']]) !!}
                                         <a href="#" class="mx-3 btn btn-sm  align-items-center bs-pass-para" data-bs-toggle="tooltip" title="{{__('Delete')}}" ><i class="ti ti-trash text-white text-white"></i></a>
@@ -129,6 +133,7 @@
                                 @endcan
 
                                     </td>
+
                                 </tr>
                             @endforeach
                             </tbody>

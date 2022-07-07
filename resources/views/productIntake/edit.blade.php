@@ -15,7 +15,7 @@
     <div class="row">
 
         <div  class="form-group col-md-6">
-            {{ Form::label('model_name[]', __('Product'),['class'=>'form-label']) }}<br>
+            {{ Form::label('model_name[]', __('Product'),['class'=>'form-label']) }}<span class="text-danger">*</span><br>
             {{ Form::select('model_name', $product_model_name,null, array('class' => 'form-control select2','id'=>'choices-multiple1')) }}
 
         </div>
@@ -26,37 +26,37 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('imei_number', __('IMEI Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
-                <div class="form-icon-user">
-                    {{ Form::text('imei_number',null, array('class' => 'form-control','required'=>'required')) }}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="form-group">
                 {{ Form::label('serial_number', __('Serial Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                     {{ Form::text('serial_number',null, array('class' => 'form-control','required'=>'required')) }}
                 </div>
             </div>
-
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('sale_price', __('Sale Price'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('imei_number', __('IMEI Number'),['class'=>'form-label']) }}
                 <div class="form-icon-user">
-                    {{ Form::number('sale_price', null, array('class' => 'form-control','required'=>'required','step'=>'0.01')) }}
+                    {{ Form::number('imei_number',null, array('class' => 'form-control')) }}
                 </div>
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('retail_price', __('Retail Price'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('color', __('Color'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
-                    {{ Form::number('retail_price', null, array('class' => 'form-control','required'=>'required','step'=>'0.01')) }}
+                    {{ Form::text('color',null, array('class' => 'form-control','required'=>'required')) }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('sale_price', __('Supplier Price'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                <div class="form-icon-user">
+                    {{ Form::number('sale_price', null, array('class' => 'form-control','required'=>'required','step'=>'0.01')) }}
                 </div>
             </div>
         </div>
@@ -93,7 +93,7 @@
          {{-- start of delivery person --}}
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('delivery_person', __('Delivery Person'),['class'=>'form-label']) }}
+                {{ Form::label('delivery_person', __('Delivery Person'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
 
                     {{ Form::select('delivery_person', $my_delivery_person, null, array('class' => 'form-control select2','id'=>'choices-multiple3','required'=>'required')) }}
