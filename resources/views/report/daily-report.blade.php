@@ -2,10 +2,10 @@
 @section('page-title')
     {{__('Daily Report')}}
 @endsection
-{{-- @section('breadcrumb')
+@section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
     <li class="breadcrumb-item">{{__('Product Daily Report')}}</li>
-@endsection --}}
+@endsection
 
 @section('content')
         <hr>
@@ -13,7 +13,7 @@
 
             <div class="col-md-4">
                 <div class="form-group">
-                    {{ Form::label('date_range', __('Date Range'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                    {{ Form::label('date_range', __('Date Range'),['class'=>'form-label']) }}
                     <div class="form-icon-user">
                         <select name="date_range_name" id="the_date_range" class="form-control">
                             @foreach ($date_range as $date_key=>$date)
@@ -27,7 +27,7 @@
                 <div class="row">
                     <div class="col-md-5">
                         <div class="form-group">
-                            {{ Form::label('start_date', __('Start Date'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                            {{ Form::label('start_date', __('Start Date'),['class'=>'form-label']) }}
                             <div class="form-icon-user">
                                 <input class="form-control" name="start_date" id="the_start_date" type="date">
                             </div>
@@ -38,7 +38,7 @@
 
                     <div class="col-md-5">
                         <div class="form-group">
-                            {{ Form::label('end_date', __('End Date'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                            {{ Form::label('end_date', __('End Date'),['class'=>'form-label']) }}
                             <div class="form-icon-user">
                                 <input class="form-control" name="end_date" id="the_end_date" type="date">
                             </div>
@@ -52,7 +52,7 @@
 
             <div class="col-md-4">
                 <div class="form-group">
-                    {{ Form::label('model_name', __('Product'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                    {{ Form::label('model_name', __('Product'),['class'=>'form-label']) }}
                     <div class="form-icon-user">
                         {{Form::select('product_name',$productselect,null,array('class'=>'form-control select2','id'=>'the_product_select','placeholder'=>'Select Product'))}}
                     </div>
@@ -61,7 +61,7 @@
 
             <div class="col-md-4">
                 <div class="form-group">
-                    {{ Form::label('the_supplier', __('Supplier'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                    {{ Form::label('the_supplier', __('Supplier'),['class'=>'form-label']) }}
                     <div class="form-icon-user">
                         {{Form::select('the_supplier',$supplierselect,null,array('class'=>'form-control select2','id'=>'the_supplier_select','placeholder'=>'Select Supplier'))}}
                     </div>
@@ -73,7 +73,7 @@
 
             <div class="col-md-4">
                 <div class="form-group">
-                    {{ Form::label('the_status', __('Stock Status'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                    {{ Form::label('the_status', __('Stock Status'),['class'=>'form-label']) }}
                     <div class="form-icon-user">
                         <select name="the_status" id="the_status_select" class="form-control">
                             @foreach ($the_status as $key=>$status)
@@ -83,16 +83,25 @@
                     </div>
                 </div>
             </div>
+
              <div class="col-md-4">
                 <div class="form-group">
-                    <div class="form-icon-user mt-4">
-                        <button id="filterbtn" class="btn btn-primary">Filter</button>
-                        <button id="resetbtn" type="reset" class="btn btn-primary">Reset</button>
-                     </div>
+                    {{ Form::label('the_supplier', __('Color'),['class'=>'form-label']) }}
+                    <div class="form-icon-user">
+                     <input class="form-control" name="color" id="the_color" type="text" placeholder="Product color" autocomplete="off">
+                    </div>
                 </div>
             </div>
 
-            <div class="col md-2"></div>
+             <div class="col-md-2">
+                <div class="form-group">
+                    <div class="form-icon-user mt-4">
+                        <button id="filterbtn" class="btn btn-primary">Filter</button>
+                        <button id="resetbtn" class="btn btn-primary">Reset</button>
+                     </div>
+                </div>
+            </div>
+            
             
              <div class="col-md-2" >
                 <div class="form-group">
@@ -106,8 +115,6 @@
                 </div>
             </div> 
 
-
-
         </div>
 
     <div class="row">
@@ -115,28 +122,29 @@
             <div class="card">
                 <div class="card-body table-border-style">
                     <div class="table-responsive">
-                        <table class="table datatable" id='myuserTable'>
+                        <table class="table datatable" id='userTable'>
                             <thead>
                             <tr>
                                 <th>{{__('Date')}}</th>
                                 <th>{{__('Product Name')}}</th>
                                 <th>{{__('Sale Price')}}</th>
                                 <th>{{__('Supplier Name')}}</th>
+                                <th>{{__('Color')}}</th>
                                 <th>{{__('Status')}}</th>
                               
                             </tr>
                             </thead>
-                            <tbody >
-                                
+                            <tbody>
+
                                 @foreach ($allproducts as $product)
                                     <tr>
                                         <td>{{$product['created_at']->format('Y-m-d')}}</td>
                                         <td>{{$product['model_name']}}</td>
                                         <td>Kshs. {{$product->sale_price}}</td>
                                         <td><a href="{{ route('supplier.show', \Crypt::encrypt($product['vender_id'])) }}">{{$product->supplier_person}}</a></td>
+                                        <td>{{$product['color']}}</td>
                                         <td>{{$product['status']}}</td>
                                     </tr>
-                                    
                                 @endforeach
 
                             </tbody>
@@ -146,23 +154,10 @@
             </div>
         </div>
     </div>
-<style>
-    .dataTables_length label{
-padding: 25px 25px
-    }
-    #myuserTable_filter label{
-padding: 25px 20px
-    }
-   
-</style>
+
        
 @endsection
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-{{-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"  defer type="text/javascript"></script> --}}
-
-<script  src="{{ asset('assets/js/plugins/daily-report.js') }}" defer type="text/javascript"></script>
 
 <script>
     // start of filter
@@ -182,11 +177,7 @@ padding: 25px 20px
 
         })
 
-
-
         $(document).on('click','#filterbtn',function(){
-
-            $.fn.dataTable.ext.errMode = 'none';
             var start_date =$('#the_start_date').val()
             var end_date =$('#the_end_date').val()
             var normal_date =$('#the_end_date').val()
@@ -194,6 +185,7 @@ padding: 25px 20px
             var product_select= $("#the_product_select").val()
             var supplier_select= $("#the_supplier_select").val()
             var status_select= $("#the_status_select").val()
+            var the_color= $("#the_color").val()
 
             $.ajax({
                 
@@ -205,158 +197,55 @@ padding: 25px 20px
                     'product_name':product_select,
                     'the_supplier':supplier_select,
                     'the_status':status_select,
+                    'the_color':the_color,
                 },
                 type:"GET",
                 dataType:'json',
                 success:function(response){
                     if(response !=null){
-                        $(".dataTable-top").remove()
-                        $(".dataTable-bottom").remove()
-                        $('#myuserTable tbody').empty()
-                        $('#myuserTable_filter').remove()
-                        // id="myuserTable_filter"
+
+                        console.log("Data",response);
                         var len = 0;
-                        //  $('#myuserTable tbody').empty(); // Empty <tbody>
-                            data = JSON.parse(response);
-                            data2=data['data']
-                            len = data2.length
+                         $('#userTable tbody').empty(); // Empty <tbody>
+                        if(response!= null){
+                            len = response.length
+                        }
 
-                            console.log('The Response',len);
-
-                                
-                    if(len>0){
-                        $('#myuserTable_filter').remove()
-
-                        total=0;
-                         for (var i = 0; i < data2.length; i++) {  
-                        $('#myuserTable_filter').remove()
-
-                                    var sale_price = (data2[i].sale_price).toLocaleString();
-                                    total +=data2[i].sale_price;
-                          
-                                    }
-                               if ( ! $.fn.DataTable.isDataTable( '#myuserTable' ) ) {
-
-
-                    $('#myuserTable').dataTable({
-                            data: data2,                
-                            "columns":[
-                                { data: 'created_at', 
-                                render: function (data, type, row) {                
-                                    d= new Date (Date.parse(data))
-                                    the_date=d.getFullYear()+'-'+ (d.getMonth() + 1)+'-'+d.getDate()
-                                    return (the_date);
-                                    } 
-                                },
-                                {data:"model_name",},
-                                {data:"sale_price"},
-                                {data:"supplier_person",
-                                        render: function ( data, type, row, meta ) {
-                                        url = "{{ route('supplier.show', ':id') }}";
-                                            url = url.replace(':id', row.vender_id);  
-                                    return '<a href="'+url+'">'+data+'</a>';
-                                }  
-                                
-                                },
-                                {data:"status"}
-
-                                    ]
-                                });
-
-                            }else{
-                                    $('#myuserTable').dataTable().fnClearTable();
-                                        $('#myuserTable').dataTable().fnDestroy();
-
-                        $('#myuserTable').dataTable({
+                        if(len > 0){
+                            var total = 0;
+                            for(var i=0; i<len; i++){                                
+                                var d= new Date (Date.parse(response[i].created_at))
+                                var date=d.getFullYear()+'-'+ (d.getMonth() + 1)+'-'+d.getDate()
+                                var product_name = response[i].model_name;
+                                var sale_price = (response[i].sale_price).toLocaleString();
+                                var supplier_person = response[i].supplier_person;
+                                var vender_id = response[i].vender_id;
+                                let url = "{{ route('supplier.show', ':id') }}";
+                                url = url.replace(':id', vender_id);
+                                var color = response[i].color;
+                                var status = response[i].status;
+                                total +=response[i].sale_price;
                             
-                            data: data2,                
-                            "columns":[
-                                { data: 'created_at', 
-                                render: function (data, type, row) {                
-                                    d= new Date (Date.parse(data))
-                                    the_date=d.getFullYear()+'-'+ (d.getMonth() + 1)+'-'+d.getDate()
-                                    return (the_date);
-                                    } 
-                                },
-                                {data:"model_name",},
-                                {data:"sale_price"},
-                                {data:"supplier_person",
-                                        render: function ( data, type, row, meta ) {
-                                        url = "{{ route('supplier.show', ':id') }}";
-                                            url = url.replace(':id', row.vender_id);  
-                                    return '<a href="'+url+'">'+data+'</a>';
-                                }  
-                                
-                                },
-                                {data:"status"}
+                                var table_data="<tr><td>"+ date +"</td><td> " + product_name + "</td><td> Kshs. " + sale_price + "</td><td><a href='" + url + "'>"+ supplier_person + "</a> </td><td>" + color + "</td><td>" + status + "</td></tr>"
 
-                                    ]
-                                });
+                                $("#userTable tbody").append(table_data);
+                                
                             }
+                            var price=total.toLocaleString();
 
-
-                                 var price=total.toLocaleString();
-
-                                var the_data="<tr id='the_row'><td></td><td></td><td></td><td></td><td><span style='color:#0CA49D'>Total Price:</span> Kshs."+ price +" <br><br> <span style='color:#0CA49D'>Total Quantity:</span>"+ len +"</td></tr>"
+                                var the_data="<tr><td></td><td></td><td></td><td></td><td><span style='color:#0CA49D'>Total Price:</span> Kshs."+ price +" <br><br> <span style='color:#0CA49D'>Total Quantity:</span>"+ len +"</td></tr>"
                                 
-                                $("#myuserTable tbody").append(the_data);
+                                $("#userTable tbody").append(the_data);
+                        }else{
+                            var tr_str = "<tr>" +"<td align='center' colspan='4'>No records found.</td>" +"</tr>";
 
-                  
-                                $(document).on('click','.paginate_button',function(){
-                                            var className = $(this).attr('class').match(/\S*current\b/i);
-                                           if(className){
-                                            if($("#the_row").is(":visible")){
-                                        } else{
-
-                                $("#myuserTable tbody").append(the_data);
-                                    }
-
-                                           }else{
-                                $("#myuserTable tbody").append(the_data);
-
-                                           }
-                            
-                                    })
-                                $(document).on('click','.dataTables_length',function(){
-                        if($("#the_row").is(":visible")){
-                                        } else{
-
-                                $("#myuserTable tbody").append(the_data);
-                                    }                    
-                                
-                                })
-
-                        //          $(document).on('click','#myuserTable_filter',function(){
-                        // if($("#the_row").is(":visible")){
-                        //                 } else{
-
-                        //         $("#myuserTable tbody").append(the_data);
-                        //             }                    
-                                
-                        //         })
-
-                                
-
-                        
-
-
+                            $("#userTable tbody").append(tr_str);
+                        }
                     }
-                    else{
-
-                        var tr_str = "<tr>" +"<td align='center' colspan='4'>No records found.</td>" +"</tr>";
-
-                            $("#myuserTable tbody").append(tr_str);
-
-                            
-                    }
-               
-         
-                }
                 },
                 error:function(error){
                 }
             })
-
         })
 
         $(document).on('change','#export_type',function(){
@@ -381,7 +270,6 @@ padding: 25px 20px
                     'end_date_name':end_date,
                     'product_name':product_select,
                     'the_supplier':supplier_select,
-                    'the_status':status_select,
                 },
                 success:function(response){
                 },error:function(error){
@@ -406,10 +294,6 @@ padding: 25px 20px
             })
          }
         })
-
-        $(document).on('click','#resetbtn',function(){
-$('#the_product_select').resetForm()
-       })
     })
     // end of filter
 
