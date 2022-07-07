@@ -3,7 +3,7 @@
 
     <h5 class="sub-title">{{__('Basic Info')}}</h5>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('first_name',__('First Name'),array('class'=>'form-label')) }}
                 <div class="form-icon-user">
@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('last_name',__('Last Name'),array('class'=>'form-label')) }}
                 <div class="form-icon-user">
@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
                 {{Form::label('contact',__('Contact'),['class'=>'form-label'])}}
                 <div class="form-icon-user">
@@ -32,6 +32,14 @@
                 {{Form::label('email',__('Email'),['class'=>'form-label'])}}
                 <div class="form-icon-user">
                     {{Form::text('email',null,array('class'=>'form-control'))}}
+                </div>
+            </div>
+        </div>
+         <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
+                {{Form::label('id_number',__('ID Number'),['class'=>'form-label'])}}
+                <div class="form-icon-user">
+                    {{Form::number('id_number',null,array('class'=>'form-control'))}}
                 </div>
             </div>
         </div>

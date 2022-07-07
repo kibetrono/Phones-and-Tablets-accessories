@@ -37,6 +37,15 @@
         </div>
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="form-group">
+                {{Form::label('password',__('ID Number'),['class'=>'form-label'])}}
+                <div class="form-icon-user">
+                    <input name="id_number" type="number" class="form-control" required minlength="8">
+                    {{-- {{Form::number('id_number',array('class'=>'form-control','required'=>'required','minlength'=>"8"))}} --}}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6">
+            <div class="form-group">
                 {{Form::label('password',__('Password'),['class'=>'form-label'])}}
                 <div class="form-icon-user">
                     {{Form::password('password',array('class'=>'form-control','required'=>'required','minlength'=>"6"))}}

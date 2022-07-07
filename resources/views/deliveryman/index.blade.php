@@ -44,8 +44,6 @@
                                 <tr>
                                     <th>#</th>
                                     <th> {{__('First Name')}}</th>
-                                    {{-- <th> {{__('All Products')}}</th> --}}
-
                                     <th> {{__('Last Name')}}</th>
                                     <th> {{__('Contact')}}</th>
                                     <th> {{__('Email')}}</th>

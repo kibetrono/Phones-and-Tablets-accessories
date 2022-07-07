@@ -52,6 +52,7 @@
                     <h5 class="card-title">{{__('Delivery Person Info')}}</h5>
                     <p class="card-text mb-0"><strong>First Name: </strong> {{$deliveryperson['first_name']}}</p>
                     <p class="card-text mb-0"><strong>Last Name: </strong> {{$deliveryperson['last_name']}}</p>
+                    <p class="card-text mb-0"><strong>ID Number: </strong> {{$deliveryperson['id_number']}}</p>
                     <p class="card-text mb-0"><strong>Email:</strong>  {{$deliveryperson['email']}}</p>
                     <p class="card-text mb-0"><strong>Contact:</strong>  {{$deliveryperson['contact']}}</p>
                 </div>
