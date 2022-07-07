@@ -11,7 +11,7 @@ class ProductIntake extends Model
     use HasFactory;
 
     protected $fillable = [
-        'model_name', 'sku', 'imei_number', 'serial_number', 'sale_price', 'retail_price', 'retail_price', 'invoice_number', 'supplier_person', 'delivery_person', 'receiving_person', 'delivery_men_id', 'product_service_id', 'type', 'created_by'
+        'model_name', 'sku', 'imei_number', 'serial_number', 'sale_price', 'retail_price', 'color', 'retail_price', 'invoice_number', 'supplier_person', 'delivery_person', 'receiving_person', 'delivery_men_id', 'product_service_id', 'type', 'created_by'
     ];
 
 

@@ -19,6 +19,7 @@ class DeliveryMan extends Authenticatable
         'last_name',
         'email',
         'tax_number',
+        'id_number',
         'password',
         'contact',
         'avatar',

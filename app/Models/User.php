@@ -349,6 +349,11 @@ class User extends Authenticatable
         return DeliveryMan::where('created_by', '=', $this->creatorId())->count();
     }
 
+    public function countQuatations()
+    {
+        return Proposal::where('created_by', '=', $this->creatorId())->count();
+    }
+
     public function countInvoices()
     {
         return Invoice::where('created_by', '=', $this->creatorId())->count();
