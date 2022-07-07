@@ -20,6 +20,7 @@ class CreateDeliveryMenTable extends Migration
             $table->string('last_name');
             $table->string('tax_number');
             $table->string('email')->nullable()->unique();
+            $table->string('id_number')->unique();
             $table->string('password');
             $table->string('contact')->nullable();
             $table->string('avatar', 100)->default('');

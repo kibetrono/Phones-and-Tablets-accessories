@@ -25,6 +25,7 @@ class CreateProductIntakesTable extends Migration
             $table->integer('quantity_delivered')->default('1');
             $table->float('sale_price',20)->default('0.0');
             $table->float('retail_price',20)->default('0.0');
+            $table->string('color');
             $table->integer('invoice_number')->nullable();
             $table->integer('returned')->default('0');
             $table->string('status')->default('received');
