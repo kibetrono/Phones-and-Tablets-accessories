@@ -1434,12 +1434,12 @@ class ReportController extends Controller
 
     public function dailyReport(Request $request)
     {
-
+            
         if (\Auth::user()->can('stock report')) {
             $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
             // dd($venders);
             $time = \Carbon\Carbon::now();
-
+            
             $dateonly = date("Y-m-d", strtotime($time));
 
             $products = ProductIntake::where('status', '=', 'sold')->whereDate('updated_at', Carbon::today())->get();
@@ -1469,1565 +1469,916 @@ class ReportController extends Controller
             // dd($supplierselect);
             $the_status = ProductIntake::$the_status;
 
-            return view('report.daily-report', compact('venders', 'products', 'allproducts', 'total_phones', 'total_price', 'date_range', 'productselect', 'supplierselect', 'the_status'));
+            return view('report.daily-report', compact('venders','products', 'allproducts', 'total_phones', 'total_price', 'date_range', 'productselect', 'supplierselect', 'the_status'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
         }
     }
 
+    public function previousData(Request $request)
+    {
+        $data = ProductIntake::all();
+                foreach ($data as $the_data) {
+                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                }
+
+                // $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+                
+                
+                $json_data['data'] = $data;
+                
+
+                echo json_encode($json_data);    
+            
+    }
+
     public function dailyReportAjaxResults(Request $request)
     {
-        // start of all five options
-        if ($request->date_range_name && $request->product_name && $request->the_supplier && $request->the_status && $request->the_color) {
-            if ($request->date_range_name == 1) {
-                if ($request->the_status == 'All Products') {
+        // json_encode
+        // $myarray = array('Guitar' => 'Johnny', 'Vocals' => 'Stephen', 'Bass' => 'Andy', 'Drums' => 'Mike');
+        // $myJson = json_encode($myarray);
+        // echo $myJson;
+
+        // serialize
+        // $myarray = array('Guitar' => 'Johnny', 'Vocals' => 'Stephen', 'Bass' => 'Andy', 'Drums' => 'Mike');
+        // $mySerial = serialize($myarray);
+        // echo $mySerial;
+
+        // json_decode
+        // $myJson = '{"Guitar" : "Johnny", "Vocals": "Stephen", "Bass" : "Andy", "Drums" : "Mike"}';
+        // $myarray = json_decode($myJson,true);
+        // print_r($myarray);
+
+
+
+
+
+
+
+
+
+        // $myarray = array('Guitar' => 'Johnny', 'Vocals' => 'Stephen', 'Bass' => 'Andy', 'Drums' => 'Mike');
+        // $mySerial = serialize($myarray);
+        // return response()->json($mySerial);
+        // echo $mySerial;
+        // $data = ProductIntake::all();
+        //  foreach ($data as $the_data) {
+        //      $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+        //  }
+
+        // // return response()->json($data);
+         
+        
+        // $json_data['data'] = $data;
+        
+
+        // echo json_encode($json_data);
+        // return response()->json($json_data['data']);
+
+        // return response()->json(json_encode($json_data));
+
+
+
+        // start of all options
+        if ($request->date_range_name && $request->product_name && $request->the_supplier && $request->the_status) {
+            if($request->date_range_name == 1){
+                if ($request->the_status == 'All Products'){
                     $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);     
+                
                 }
-                 else {
+                else{
                     $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);  
+                
                 }
-            } 
+            }
             elseif ($request->date_range_name == 2) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                     $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);     
+                
+                }
+                else{
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                     $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);     
+                
                 }
             }
              elseif ($request->date_range_name == 3) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                     $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);     
+                
+                }else{
 
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-
-                    return response()->json($data);
-                }
-            } 
-            else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                        ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-
-                    return response()->json($data);
-                }
-            }
-        }
-        // end of all five options
-
-        // start of four options
-        if ($request->date_range_name && $request->product_name && $request->the_supplier && $request->the_status) {
-
-            if ($request->date_range_name == 1) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 2) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                    ->where('supplier_person', $request->the_supplier)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                    ->where('supplier_person', $request->the_supplier)->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                    ->where('supplier_person', $request->the_supplier)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                    ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                    ->where('supplier_person', $request->the_supplier)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                    ->where('supplier_person', $request->the_supplier)->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-
-        if ($request->date_range_name && $request->product_name && $request->the_supplier && $request->the_color) {
-            if ($request->date_range_name == 1) {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 2) {
-                $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 3) {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);           
+                
                 }
-
-                return response()->json($data);
             } 
             elseif ($request->date_range_name == 4) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
+                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);    
+                
+                }else{
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
+                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);                }
             } 
             elseif ($request->date_range_name == 5) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
+                    ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            } 
-            else {
-                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);    
+                
+                }else{
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
+                        ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);                }
             }
-        }
-      
-        if ($request->date_range_name && $request->the_supplier && $request->the_status && $request->the_color) {
-            if ($request->date_range_name == 1) {
+             else {
                 if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 2) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('color', $request->the_color)->where('updated_at', '>=', $thedate)
+                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
                         ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('supplier_person', $request->the_supplier)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-       
-        if ($request->date_range_name && $request->product_name && $request->the_status && $request->the_color) {
-            if ($request->date_range_name == 1) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('color', $request->the_color)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                    ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 2) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-                 else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('model_name', $request->product_name)
-                    ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('model_name', $request->product_name)->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('model_name', $request->product_name)->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-             else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                        ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-    
-        if ($request->product_name && $request->the_supplier && $request->the_status && $request->the_color) {
-            if ($request->the_status == 'All Products') {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                    ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } 
-            else {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                    ->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            }
-        }
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-        // end of four options
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);     
+                         
+                }else{
+                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-        // start of three options
-        if ($request->date_range_name && $request->product_name && $request->the_supplier ) {
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);    
+                       
+                }
+            }
+        }
+        // end of all options
+
+        // start of all three options
+        // start of row one
+        if ($request->date_range_name && $request->product_name && $request->the_supplier) {
             if ($request->date_range_name == 1) {
                 $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            }
-             elseif ($request->date_range_name == 2) {
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            } elseif ($request->date_range_name == 2) {
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 3) {
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2); 
+            
+            } elseif ($request->date_range_name == 3) {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            }
-            elseif ($request->date_range_name == 4) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);    
+            
+            } elseif ($request->date_range_name == 4) {
+                $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 5) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);     
+            
+            } elseif ($request->date_range_name == 5) {
+                $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            }
-            else {
-                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                ->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);    
+            
+            } else {
+                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
-            }
-        }     
-
-        if ($request->date_range_name && $request->product_name && $request->the_color) {
-            if ($request->date_range_name == 1) {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 2) {
-                $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 3) {
-                $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
-                ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 4) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                ->where('model_name', $request->product_name)->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 5) {
-                $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->where('model_name', $request->product_name)
-                ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            else {
-                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
-                ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);    
+            
             }
         }
+        // end of row one
 
+        // start of row two
         if ($request->date_range_name && $request->the_supplier && $request->the_status) {
             if ($request->date_range_name == 1) {
                 if ($request->the_status == 'All Products') {
                     $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);         
+                
+                }else{
+                $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
             } 
             elseif ($request->date_range_name == 2) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                     $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)
-                    ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                    ->where('supplier_person', $request->the_supplier)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } 
-                else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-
-        if ($request->date_range_name && $request->the_status&& $request->the_color) {
-            if ($request->date_range_name == 1) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->where('color', $request->the_color)
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } 
-            elseif ($request->date_range_name == 2) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('color', $request->the_color)
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('color', $request->the_color)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-
-        if ($request->date_range_name && $request->the_color && $request->the_supplier) {
-            if ($request->date_range_name == 1) {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 2) {
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('color', $request->the_color)
-                ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-
-                return response()->json($data);
             } 
             elseif ($request->date_range_name == 3) {
+                if ($request->the_status == 'All Products') {
+                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
+                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
+                    ->where('supplier_person', $request->the_supplier)->get();
+                   foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('color', $request->the_color)
-                ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-
-                return response()->json($data);
-            } 
-            elseif ($request->date_range_name == 4) {
+            }
+             elseif ($request->date_range_name == 4) {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                ->where('color', $request->the_color)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-
-                return response()->json($data);
             } 
             elseif ($request->date_range_name == 5) {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                ->where('color', $request->the_color)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-
-                return response()->json($data);
-            } 
-            else {
+            }
+             else {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
+                        ->where('supplier_person', $request->the_supplier)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                ->where('color', $request->the_color)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-
-                return response()->json($data);
             }
         }
+        // end of row two
 
-        if ($request->date_range_name  && $request->product_name && $request->the_status) {
+        // start of row three
+        if ($request->date_range_name && $request->product_name && $request->the_status) {
             if ($request->date_range_name == 1) {
                 if ($request->the_status == 'All Products') {
                     $data = ProductIntake::select('*')->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
+                $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-            } elseif ($request->date_range_name == 2) {
+            }
+            elseif ($request->date_range_name == 2) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 } else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-            } elseif ($request->date_range_name == 3) {
+            } 
+            elseif ($request->date_range_name == 3) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 } else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
+                $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-            } elseif ($request->date_range_name == 4) {
+            } 
+            elseif ($request->date_range_name == 4) {
                 if ($request->the_status == 'All Products') {
                     $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
                         ->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
+                    ->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-            } elseif ($request->date_range_name == 5) {
+            } 
+            elseif ($request->date_range_name == 5) {
                 if ($request->the_status == 'All Products') {
                     $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
                         ->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                        $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
                 } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
+                    ->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
                 }
-            } else {
+            } 
+            else {
                 if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
                 } else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                        ->where('status', $request->the_status)->where('model_name', $request->product_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
                 }
             }
         }
+        // end of row three
 
+        // start of row four
         if ($request->product_name && $request->the_supplier && $request->the_status) {
-            if ($request->the_status == 'All Products') {
+            if($request->the_status == 'All Products'){
                 $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } 
-            else {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            }
-        }
-
-        if ($request->the_supplier && $request->the_status && $request->the_color) {
-            if ($request->the_status == 'All Products') {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)
                     ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } 
-            else {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)
-                    ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            }
-        }
-
-        if ($request->product_name && $request->the_supplier && $request->the_color) {
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            }else{           
             $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-            ->where('supplier_person', $request->the_supplier)->where('color', $request->the_color)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
-
-        if ($request->product_name && $request->the_status && $request->the_color) {
-            if ($request->the_status == 'All Products') {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                    ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                    ->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                ->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
             }
         }
-       
-        // end of three options
+        // end of row four
 
-      
-        // start of two options
-    
+        // end of  all three options
+
+        // start of all two options
+        // start of row one
         if ($request->date_range_name && $request->product_name) {
             if ($request->date_range_name == 1) {
                 $data = ProductIntake::select('*')->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);     
+            
             } elseif ($request->date_range_name == 2) {
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+                       
             } elseif ($request->date_range_name == 3) {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 4) {
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 5) {
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } else {
                 $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('model_name', $request->product_name)->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
 
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
-        
+        // end of row one
+        // start of row two
         if ($request->date_range_name && $request->the_supplier) {
             if ($request->date_range_name == 1) {
                 $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 2) {
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
                     ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 3) {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
                     ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 4) {
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
                     ->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 5) {
 
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
                     ->where('supplier_person', $request->the_supplier)->get();
 
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } else {
                 $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
                     ->where('supplier_person', $request->the_supplier)->get();
                 foreach ($data as $the_data) {
                     $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
                 }
-                return response()->json($data);
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
-        
+        // end of row  two
+        // start of row three
         if ($request->date_range_name && $request->the_status) {
             if ($request->date_range_name == 1) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::all();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
+                if($request->the_status == 'All Products'){
+                    $data=ProductIntake::all();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                     $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                    
                 }
-            } elseif ($request->date_range_name == 2) {
+                else{
+                $data = ProductIntake::select('*')->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);                }
+            } 
+            elseif ($request->date_range_name == 2) {
                 if ($request->the_status == 'All Products') {
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                     $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 3) {
-                if ($request->the_status == 'All Products') {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 4) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } elseif ($request->date_range_name == 5) {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                        ->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            } else {
-                if ($request->the_status == 'All Products') {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                } else {
-                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('status', $request->the_status)->get();
-                    foreach ($data as $the_data) {
-                        $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                    }
-                    return response()->json($data);
-                }
-            }
-        }
-
-        if ($request->date_range_name && $request->the_color) {
-            if ($request->date_range_name == 1) {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } elseif ($request->date_range_name == 2) {
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-                return response()->json($data);
-            } elseif ($request->date_range_name == 3) {
+            } 
+            elseif ($request->date_range_name == 3) {
+                if ($request->the_status == 'All Products') {
+                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
+                    $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                } else {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                 $data = ProductIntake::select('*')->where('updated_at', '>=', $thedate)
-                    ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } elseif ($request->date_range_name == 4) {
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
+            }
+            } 
+            elseif ($request->date_range_name == 4) {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                } else {
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])
-                    ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-                return response()->json($data);
-            } elseif ($request->date_range_name == 5) {
-
+            } 
+            elseif ($request->date_range_name == 5) {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                } else {
                 $data = ProductIntake::select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])
-                    ->where('color', $request->the_color)->get();
-
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+                    ->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)
-                    ->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
+            } 
+            else {
+                if ($request->the_status == 'All Products') {
+                    $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->get();
+                    foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
+                }else{
+                $data = ProductIntake::select('*')->where('updated_at', $request->date_range_name)->where('status', $request->the_status)->get();
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                    $json_data['data'] = $data;
+                    $data2 = json_encode($json_data);
+                    return response()->json($data2);
+                
                 }
-                return response()->json($data);
             }
         }
-        
+        // end of row  three
+        // start of row four
         if ($request->product_name && $request->the_supplier) {
             $data = ProductIntake::select('*')->where('model_name', $request->product_name)
                 ->where('supplier_person', $request->the_supplier)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+            $json_data['data'] = $data;
+            $data2 = json_encode($json_data);
+            return response()->json($data2);
         
+        }
+        // end of row four 
+        // start of row five
         if ($request->product_name && $request->the_status) {
             if ($request->the_status == 'All Products') {
                 $data = ProductIntake::select('*')->where('model_name', $request->product_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
+            }else{
+            $data = ProductIntake::select('*')->where('model_name', $request->product_name)->where('status', $request->the_status)->get();
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
-
-        if ($request->product_name && $request->the_color) {
-            $data = ProductIntake::select('*')->where('model_name', $request->product_name)
-                ->where('color', $request->the_color)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
-        
+        // end of row  five
+        // start of row six
         if ($request->the_supplier && $request->the_status) {
             if ($request->the_status == 'All Products') {
                 $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+                
+            }else{
+            $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->where('status', $request->the_status)->get();
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
+        // end of row six 
+        // end of all two options
 
-        if ($request->the_supplier && $request->the_color) {
-            $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)
-                ->where('color', $request->the_color)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
-
-        if ($request->the_status && $request->the_color) {
-            if ($request->the_status == 'All Products') {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('color', $request->the_color)->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            }
-        }
-       
-        // end of two options
-
-        // start of single option
+        // start of the whole single option
+        // start of date range only
         if ($request->date_range_name) {
             if ($request->date_range_name == 1) {
                 $data = ProductIntake::all();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 2) {
                 $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                 $data = ProductIntake::with('productservice')->select('*')->where('updated_at', '>=', $thedate)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 3) {
                 $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                 $data = ProductIntake::with('productservice')->select('*')->where('updated_at', '>=', $thedate)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 4) {
                 $data = ProductIntake::with('productservice')->select('*')->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()])->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } elseif ($request->date_range_name == 5) {
                 $data = ProductIntake::with('productservice')->select('*')->whereBetween('updated_at', [$request->start_date_name, $request->end_date_name])->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             } else {
                 $data = ProductIntake::with('productservice')->select('*')->where('updated_at', $request->date_range_name)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
-        
+        // end of date range only
+        // start of product name only
         if ($request->product_name) {
             $data = ProductIntake::select('*')->where('model_name', $request->product_name)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+            $json_data['data'] = $data;
+            $data2 = json_encode($json_data);
+            return response()->json($data2);
+        
         }
-       
+        // end of product name only
+        // start of supplier only
         if ($request->the_supplier) {
             $data = ProductIntake::select('*')->where('supplier_person', $request->the_supplier)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+            $json_data['data'] = $data;
+            $data2 = json_encode($json_data);
+            return response()->json($data2);
         
+        }
+        // end of supplier only
+        // start of status only
         if ($request->the_status) {
             if ($request->the_status == 'All Products') {
                 $data = ProductIntake::all();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
-            } else {
-                $data = ProductIntake::select('*')->where('status', $request->the_status)->get();
-                foreach ($data as $the_data) {
-                    $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-                }
-                return response()->json($data);
+                foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
+            }else{
+            $data = ProductIntake::select('*')->where('status', $request->the_status)->get();
+            foreach ($data as $the_data) {$the_data->vender_id = \Crypt::encrypt($the_data->vender_id);}
+                $json_data['data'] = $data;
+                $data2 = json_encode($json_data);
+                return response()->json($data2);
+            
             }
         }
-
-        if ($request->the_color) {
-            $data = ProductIntake::select('*')->where('color', $request->the_color)->get();
-            foreach ($data as $the_data) {
-                $the_data->vender_id = \Crypt::encrypt($the_data->vender_id);
-            }
-            return response()->json($data);
-        }
-        
-        // end of single option
+        // end of status only
+        // end of the whole single option
     }
 
     public function exportdata(Request $request)
     {
-        $data = DB::table('product_intakes')
+        $data=DB::table('product_intakes')
 
             ->when(request()->input('date_range_name'), function ($query) {
 
                 if (request()->input('date_range_name') == 1) {
                     $query->select('*');
-                } elseif (request()->input('date_range_name') == 2) {
+                } 
+                elseif(request()->input('date_range_name') == 2) {
                     $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
                     $query->where('updated_at', '>=', $thedate);
-                } elseif (request()->input('date_range_name') == 3) {
+                } 
+                elseif (request()->input('date_range_name') == 3) {
                     $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
                     $query->where('updated_at', '>=', $thedate);
-                } elseif (request()->input('date_range_name') == 4) {
+                } 
+                elseif (request()->input('date_range_name') == 4) {
                     $query->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
-                } elseif (request()->input('date_range_name') == 5) {
+                } 
+                elseif (request()->input('date_range_name') == 5) {
                     $query->whereBetween('updated_at', [request()->input('start_date_name'), request()->input('end_date_name')]);
-                } else {
+                } 
+                else {
                     $query->where('updated_at', request()->input('date_range_name'));
                 }
+
             })
 
             ->when(request()->input('product_name'), function ($query) {
@@ -3038,7 +2389,7 @@ class ReportController extends Controller
                 $query->where('supplier_person', request()->input('the_supplier'));
             })
 
-            ->when(request()->input('the_status'), function ($query) {
+            ->when(request()->input('the_status'), function ($query){
                 if (request()->input('the_status') == 'All Products') {
                     $query->select('*');
                 } else {
@@ -3060,42 +2411,42 @@ class ReportController extends Controller
         $data = DB::table('product_intakes')
 
 
-            ->when(request()->input('date_range_name'), function ($query) {
+        ->when(request()->input('date_range_name'), function ($query) {
 
-                if (request()->input('date_range_name') == 1) {
-                    $query->select('*');
-                } elseif (request()->input('date_range_name') == 2) {
-                    $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
-                    $query->where('updated_at', '>=', $thedate);
-                } elseif (request()->input('date_range_name') == 3) {
-                    $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
-                    $query->where('updated_at', '>=', $thedate);
-                } elseif (request()->input('date_range_name') == 4) {
-                    $query->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
-                } elseif (request()->input('date_range_name') == 5) {
-                    $query->whereBetween('updated_at', [request()->input('start_date_name'), request()->input('end_date_name')]);
-                } else {
-                    $query->where('updated_at', request()->input('date_range_name'));
-                }
-            })
+            if (request()->input('date_range_name') == 1) {
+                $query->select('*');
+            } elseif (request()->input('date_range_name') == 2) {
+                $thedate = Carbon::now()->subDays(7)->format('Y-m-d');
+                $query->where('updated_at', '>=', $thedate);
+            } elseif (request()->input('date_range_name') == 3) {
+                $thedate = Carbon::now()->subDays(30)->format('Y-m-d');
+                $query->where('updated_at', '>=', $thedate);
+            } elseif (request()->input('date_range_name') == 4) {
+                $query->whereBetween('updated_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
+            } elseif (request()->input('date_range_name') == 5) {
+                $query->whereBetween('updated_at', [request()->input('start_date_name'), request()->input('end_date_name')]);
+            } else {
+                $query->where('updated_at', request()->input('date_range_name'));
+            }
+        })
 
-            ->when(request()->input('product_name'), function ($query) {
-                $query->where('model_name', request()->input('product_name'));
-            })
+        ->when(request()->input('product_name'), function ($query) {
+            $query->where('model_name', request()->input('product_name'));
+        })
 
-            ->when(request()->input('the_supplier'), function ($query) {
-                $query->where('supplier_person', request()->input('the_supplier'));
-            })
+        ->when(request()->input('the_supplier'), function ($query) {
+            $query->where('supplier_person', request()->input('the_supplier'));
+        })
 
-            ->when(request()->input('the_status'), function ($query) {
-                if (request()->input('the_status') == 'All Products') {
-                    $query->select('*');
-                } else {
-                    $query->where('status', request()->input('the_status'));
-                }
-            })
+        ->when(request()->input('the_status'), function ($query) {
+            if (request()->input('the_status') == 'All Products') {
+                $query->select('*');
+            } else {
+                $query->where('status', request()->input('the_status'));
+            }
+        })
 
-            ->get();
+        ->get();
 
         $allproducts = [
             'title' => $data,
@@ -3113,4 +2464,6 @@ class ReportController extends Controller
         // return $pdf->download('itsolutionstuff.pdf');
 
     }
+
+
 }

@@ -21,21 +21,22 @@ use App\Http\Requests\ProductIntakeStoreRequest;
 
 class ProductIntakeController extends Controller
 {
-    public function Filter_order_imei(Request $request){
+    public function Filter_order_imei(Request $request)
+    {
 
         // $data=ProductIntake::select('imei_number')->where('model_name',$request->the_model_name)->get();
-        $select =$request->select;
-        $value =$request->value;
+        $select = $request->select;
+        $value = $request->value;
         $dependent = $request->dependent;
-        
-        $data=DB::table('product_intakes')
-        ->where($select, $value)
-        ->groupBy($dependent)
-        ->get();
+
+        $data = DB::table('product_intakes')
+            ->where($select, $value)
+            ->groupBy($dependent)
+            ->get();
 
         // $output = '<option value="" class="select2"> Select ' . ucfirst($dependent) . '</option>';
 
-        $output='<select class="select2"><option value=""> Select ' . ucfirst($dependent) . '</option></select>';
+        $output = '<select class="select2"><option value=""> Select ' . ucfirst($dependent) . '</option></select>';
 
         foreach ($data as $row) {
             $output .= '<option value="' . $row->$dependent . '">' . $row->$dependent . '</option>';
@@ -66,12 +67,11 @@ class ProductIntakeController extends Controller
     public function totalProductsInStock()
     {
         $total = ProductIntake::groupBy('status')
-        ->selectRaw('count(*) as count, status')
-        ->where('status','=', 'instock')
-        ->pluck('count');
+            ->selectRaw('count(*) as count, status')
+            ->where('status', '=', 'instock')
+            ->pluck('count');
         // return $total;
         return response()->json($total);
-
     }
 
     /**
@@ -82,22 +82,18 @@ class ProductIntakeController extends Controller
     public function index(Request $request)
     {
 
-        if (\Auth::user()->can('manage product & service'))
-        {
-                
-            $productIntakes = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
-            
-            if($request->has('search')){
-                
-                $productIntakes = ProductIntake::where('serial_number', 'like', "%{$request->search}%")->orWhere('imei_number', 'like', "%{$request->search}%")->get();
+        if (\Auth::user()->can('manage product & service')) {
 
+            $productIntakes = ProductIntake::where('created_by', '=', \Auth::user()->creatorId())->get();
+
+            if ($request->has('search')) {
+
+                $productIntakes = ProductIntake::where('serial_number', 'like', "%{$request->search}%")->orWhere('imei_number', 'like', "%{$request->search}%")->get();
             }
             // $ret= $productIntakes;
             // dd($productIntakes);
             return view('productIntake.index', compact('productIntakes'));
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -111,20 +107,18 @@ class ProductIntakeController extends Controller
     {
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            
 
-            $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
-            $supplier_person            = Vender::all()->pluck('name','name');
+
+            $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
+            $supplier_person            = Vender::all()->pluck('name', 'name');
             $delivery_person            = DeliveryMan::all()->pluck('contact', 'contact');
             $delivery_person_concat = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
             $receiving_person            = \Auth::user()->name;
             // dd($receiving_person);
-            return view('productIntake.create', compact('product_model_name', 'supplier_person', 'delivery_person', 'receiving_person', 'delivery_person_concat','customFields'));
-        }
-        else
-        {
+            return view('productIntake.create', compact('product_model_name', 'supplier_person', 'delivery_person', 'receiving_person', 'delivery_person_concat', 'customFields'));
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
-        } 
+        }
     }
     /**
      * Store a newly created resource in storage.
@@ -134,23 +128,24 @@ class ProductIntakeController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         if (\Auth::user()->can('create product & service')) {
 
             $rules = [
                 'model_name' => 'required',
                 'imei_number' => 'unique:product_intakes',
-                'serial_number' =>'unique:product_intakes',            
-                'product_service_id' => 'required',                
+                'serial_number' => 'unique:product_intakes',
+                'product_service_id' => 'required',
                 'delivery_man_id' => 'required',
                 'vender_id' => 'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
+                'color' => 'required',
                 // 'invoice_number' => 'required',
                 'supplier_person' => 'required',
                 'delivery_person' => 'required',
                 'receiving_person' => 'required',
-                
+
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -176,22 +171,23 @@ class ProductIntakeController extends Controller
             if ($request->serial_number_down) {
                 $productIntake->serial_number   = $request->serial_number_down;
             }
-           
-            $productIntake->product_service_id   = $request->product_service_id;
-            $productIntake->delivery_man_id = $request->delivery_man_id;
-            $productIntake->vender_id = $request->vender_id;
-            $productIntake->sale_price      = $request->sale_price;
-            $productIntake->retail_price    = $request->retail_price;
-            $productIntake->status          = 'received';
-            $productIntake->supplier_person  = $request->supplier_person;
-            $productIntake->delivery_person  = $request->delivery_person;
-            $productIntake->receiving_person  = $request->receiving_person;
 
-            $productIntake->created_by      = \Auth::user()->creatorId();
+            $productIntake->product_service_id   = $request->product_service_id;
+            $productIntake->delivery_man_id      = $request->delivery_man_id;
+            $productIntake->vender_id            = $request->vender_id;
+            $productIntake->sale_price           = $request->sale_price;
+            $productIntake->retail_price         = $request->retail_price;
+            $productIntake->color                = $request->color;
+            $productIntake->status               = 'received';
+            $productIntake->supplier_person      = $request->supplier_person;
+            $productIntake->delivery_person      = $request->delivery_person;
+            $productIntake->receiving_person     = $request->receiving_person;
+
+            $productIntake->created_by           = \Auth::user()->creatorId();
             $time = \Carbon\Carbon::now();
             $dateonly = date("Y-m-d", strtotime($time));
-            $productIntake->updated_at      = $dateonly;
-            
+            $productIntake->updated_at           = $dateonly;
+
             $productIntake->save();
 
             // return response()->json($productIntake);
@@ -206,7 +202,7 @@ class ProductIntakeController extends Controller
             // return response()->json($products);
 
             return redirect()->back()->with('error', __('Permission denied.'));
-        } 
+        }
     }
     public function storeData(Request $request)
     {
@@ -272,32 +268,29 @@ class ProductIntakeController extends Controller
     {
         $productIntake = ProductIntake::find($id);
 
-        if (\Auth::user()->can('edit product & service'))
-        {
-            
-            if ($productIntake->created_by == \Auth::user()->creatorId())
-            {
-                $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name','name');
+        if (\Auth::user()->can('edit product & service')) {
+
+            if ($productIntake->created_by == \Auth::user()->creatorId()) {
+                $product_model_name         = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
                 $the_supplier_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
                 $the_delivery_person        = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('contact', 'contact');
                 // $the_receiving_person        = ::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'name');
-                
+
                 $del_person  = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
                 // dd($del_person);
                 $delivery_person_concat = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->get();
-                $my_delivery_person= DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
+                $my_delivery_person = DeliveryMan::select(DB::raw("CONCAT(first_name,' ',last_name) AS name"), 'contact')->pluck('name', 'contact');
 
                 // dd($delivery_person_concat);
 
 
-                return view('productIntake.edit', compact( 'product_model_name','productIntake', 'the_supplier_person', 'the_delivery_person', 'del_person', 'delivery_person_concat', 'my_delivery_person'));
+                return view('productIntake.edit', compact('product_model_name', 'productIntake', 'the_supplier_person', 'the_delivery_person', 'del_person', 'delivery_person_concat', 'my_delivery_person'));
             } else {
                 return response()->json(['error' => __('Permission denied.')], 401);
             }
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
-
     }
 
     /**
@@ -314,22 +307,24 @@ class ProductIntakeController extends Controller
 
         if (\Auth::user()->can('edit product & service')) {
             $productIntake = ProductIntake::find($id);
+            // dd($productIntake);
             $rules = [
                 'model_name' => 'required',
                 'imei_number' => 'unique:product_intakes,imei_number,' . $id,
                 'serial_number' => 'unique:product_intakes,serial_number,' . $id,
 
                 // 'imei_number' => [
-                //     'required',
+
                 //     Rule::unique('product_intakes', 'imei_number')->ignore($request->id),
                 // ],
                 // 'serial_number' => [
                 //     'required',
                 //     Rule::unique('product_intakes', 'serial_number')->ignore($request->id),
                 // ],
-                'product_service_id'=>'required',
+                'product_service_id' => 'required',
                 'sale_price' => 'required|numeric',
                 'retail_price' => 'required|numeric',
+                'color' => 'required',
                 // 'invoice_number' => 'required',
                 'supplier_person' => 'required',
                 'delivery_person' => 'required',
@@ -342,36 +337,40 @@ class ProductIntakeController extends Controller
 
                 return redirect()->route('productintake.index')->with('error', $messages->first());
             }
-                // $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
-                $productIntake->id      = $productIntake->id;
-                $productIntake->model_name      = $request->model_name;
-                $productIntake->imei_number     = $request->imei_number;
-                $productIntake->serial_number   = $request->serial_number;
-                $productIntake->product_service_id   = $request->product_service_id;
-                $productIntake->delivery_man_id   = $request->delivery_man_id;
-                $productIntake->vender_id   = $request->vender_id;
-                $productIntake->quantity_delivered   =  $productIntake->quantity_delivered;
-            
-                $productIntake->sale_price      = $request->sale_price;
-                $productIntake->retail_price    = $request->retail_price;
-                $productIntake->returned  = $productIntake->returned;
-                $productIntake->status          = $productIntake->status;
-                $productIntake->supplier_person  = $request->supplier_person;
-                $productIntake->delivery_person  = $request->delivery_person;
-                $productIntake->receiving_person  = $request->receiving_person;
-               $productIntake->receiving_person  = \Auth::user()->name;
+            // $productIntake->model_name      = !empty($request->model_name) ? implode(',', $request->model_name) : '';
+            $productIntake->id      = $productIntake->id;
+            $productIntake->model_name      = $request->model_name;
 
-                $productIntake->returning_person  = $productIntake->returning_person;
+            if ($request->imei_number != '') {
+                $productIntake->imei_number     = $request->imei_number;
+            } else {
+                $productIntake->imei_number     = null;
+            }
+            $productIntake->serial_number   = $request->serial_number;
+            $productIntake->product_service_id   = $request->product_service_id;
+            $productIntake->delivery_man_id   = $request->delivery_man_id;
+            $productIntake->vender_id   = $request->vender_id;
+            $productIntake->quantity_delivered   =  $productIntake->quantity_delivered;
+
+            $productIntake->sale_price      = $request->sale_price;
+            $productIntake->retail_price    = $request->retail_price;
+            $productIntake->color    = $request->color;
+            $productIntake->returned  = $productIntake->returned;
+            $productIntake->status          = $productIntake->status;
+            $productIntake->supplier_person  = $request->supplier_person;
+            $productIntake->delivery_person  = $request->delivery_person;
+            $productIntake->receiving_person  = $request->receiving_person;
+            $productIntake->receiving_person  = \Auth::user()->name;
+            $productIntake->returning_person  = $productIntake->returning_person;
             $time = \Carbon\Carbon::now();
 
             $dateonly = date("Y-m-d", strtotime($time));
-                $productIntake->created_by      = \Auth::user()->creatorId();
+            $productIntake->created_by      = \Auth::user()->creatorId();
             $productIntake->updated_at      = $dateonly;
-                $productIntake->save();
-                CustomField::saveData($productIntake, $request->customField);
+            $productIntake->save();
+            CustomField::saveData($productIntake, $request->customField);
 
-                return redirect()->route('productintake.index')->with('success', __('Product successfully updated.'));
-
+            return redirect()->route('productintake.index')->with('success', __('Product successfully updated.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -387,16 +386,14 @@ class ProductIntakeController extends Controller
     {
         if (\Auth::user()->can('delete product & service')) {
             $productIntake = ProductIntake::find($id);
-            
+
             $productIntake->delete();
 
             return redirect()->route('productintake.index')->with('success', __('Product successfully deleted.'));
-   
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
-
 
     public function export()
     {
@@ -404,7 +401,7 @@ class ProductIntakeController extends Controller
         $name = 'product_intake_' . date('Y-m-d i:h:s');
 
         $data = Excel::download(new ProductIntakeExport(), $name . '.xlsx');
-       
+
         // return Excel::download(new ExportUser, 'users.xlsx');
 
         // dd($data);
@@ -416,7 +413,7 @@ class ProductIntakeController extends Controller
     {
         return view('productintake.import');
     }
-  
+
     public function import(Request $request)
     {
 
@@ -492,4 +489,3 @@ class ProductIntakeController extends Controller
         return redirect()->back()->with($data['status'], $data['msg']);
     }
 }
-

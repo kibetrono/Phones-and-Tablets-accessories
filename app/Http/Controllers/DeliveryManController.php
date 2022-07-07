@@ -84,21 +84,28 @@ class DeliveryManController extends Controller
                 'first_name' => 'required',
                 'last_name' => 'required',
                 'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => 'required|email|unique:customers',
+                'email' => 'email|unique:delivery_men',
+                'id_number' => 'unique:delivery_men',
                 'password' => 'required',
-
+                
             ];
+
+
+            // dd($rules);
 
 
             $validator = \Validator::make($request->all(), $rules);
 
-            if ($validator->fails()) {
-                $messages = $validator->getMessageBag();
+            // dd($validator);
 
+            if ($validator->fails()) {
+                
+                $messages = $validator->getMessageBag();
                 return redirect()->route('deliveryman.index')->with('error', $messages->first());
             }
 
             $objCustomer    = \Auth::user();
+            // dd($objCustomer);
             $creator        = User::find($objCustomer->creatorId());
             $total_customer = $objCustomer->countDeliveryPersons();
             $plan           = Plan::find($creator->plan);
@@ -111,6 +118,7 @@ class DeliveryManController extends Controller
                     'last_name' => $request->last_name,
                     'contact' => $request->contact,
                     'email' => $request->email,
+                    'id_number' => $request->id_number,
                     'tax_number' => $request->tax_number,
                     'password' => Hash::make($request->password),
                     'created_by' => \Auth::user()->creatorId(),
@@ -226,6 +234,8 @@ class DeliveryManController extends Controller
                 'first_name' => 'required',
                 'last_name' => 'required',
                 'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'id_number' => 'unique:delivery_men,id_number,' . $id,
+
             ];
 
 
@@ -240,6 +250,7 @@ class DeliveryManController extends Controller
             $deliveryMan->last_name             = $request->last_name;
             $deliveryMan->contact          = $request->contact;
             $deliveryMan->email            = $request->email;
+            $deliveryMan->id_number            = $request->id_number;
             $deliveryMan->tax_number        =$request->tax_number;
             $deliveryMan->created_by       = \Auth::user()->creatorId();
            
