@@ -31,7 +31,7 @@
         
         <div class="col-md-6">
             <div class="form-group">
-                {{ Form::label('sale_price', __('Sale Price'),['class'=>'form-label']) }}<span class="text-danger">*</span>
+                {{ Form::label('sale_price', __('Supplier Price'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
                     {{ Form::number('sale_price', '', array('class' => 'form-control','id'=>'sale_price','required'=>'required','step'=>'0.01','placeholder'=>'Enter sale price')) }}
                 </div>
@@ -85,6 +85,15 @@
             </div>
         </div>
 
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ Form::label('color', __('Color'),['class'=>'form-label']) }}
+                <div class="form-icon-user">
+                    <input name="color" id="the_color" class="form-control" type="text" placeholder="Enter product color" required autocomplete="off">
+                </div>
+            </div>
+        </div>
+
         @if(!$customFields->isEmpty())
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">
@@ -95,20 +104,20 @@
     </div>
 
     <div class="row ">
-         <div class="col-md-4">
-            <div class="form-group">
-                {{ Form::label('imei_number', __('IMEI Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
-                <div class="form-icon-user">
-                    {{ Form::number('imei_number', '', array('class' => 'form-control','id'=>'ime',"placeholder"=>"Enter imei number")) }}
-                </div>
-            </div>
-        </div> 
-
         <div class="col-md-4">
             <div class="form-group">
                 {{ Form::label('serial_number', __('Serial Number'),['class'=>'form-label']) }}<span class="text-danger">*</span>
                 <div class="form-icon-user">
-                    {{ Form::text('serial_number', '', array('class' => 'form-control','id'=>'ser',"placeholder"=>"Enter serial")) }}
+                    {{ Form::text('serial_number', '', array('class' => 'form-control','id'=>'ser',"placeholder"=>"Enter serial",'required'=>'required')) }}
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-4">
+            <div class="form-group">
+                {{ Form::label('imei_number', __('IMEI Number'),['class'=>'form-label']) }}
+                <div class="form-icon-user">
+                    {{ Form::number('imei_number', '', array('class' => 'form-control','id'=>'ime',"placeholder"=>"Enter imei number")) }}
                 </div>
             </div>
         </div>
@@ -154,9 +163,10 @@
             }
 
         })
-        var myAdds='<div id="removed" class="row "><div class="col-md-4 ml-1"><div class="form-group">{{ Form::label("imei_number", __("IMEI Number"),["class"=>"form-label"]) }}<span class="text-danger">*</span><div class="form-icon-user">{{ Form::number("imei_number_down", "", array("class" => "form-control","id"=>"imei_number_down","required"=>"required","placeholder"=>"Enter imei number")) }}</div></div></div><div class="col-md-4"><div class="form-group">{{ Form::label("serial_number", __("Serial Number"),["class"=>"form-label"]) }}<span class="text-danger">*</span><div class="form-icon-user">{{ Form::text("serial_number_down", "", array("class" => "form-control","id"=>"serial_number_down","required"=>"required","placeholder"=>"Enter serial")) }}</div></div></div><div class="col-md-4 mt-3"><div class="input-group-append pt-3"><button class="btn btn-danger remove_field btn-sm" type="button"><i class="fa fa-minus"></i></button>&nbsp<button class="btn btn-success save_field btn-sm" type="button">save</button></div></div></div>'
+        var myAdds='<div id="removed" class="row "><div class="col-md-4 ml-1"><div class="form-group">{{ Form::label("serial_number", __("Serial Number"),["class"=>"form-label"]) }}<span class="text-danger">*</span><div class="form-icon-user">{{ Form::text("serial_number_down", "", array("class" => "form-control","id"=>"serial_number_down","required"=>"required","placeholder"=>"Enter serial")) }}</div></div></div><div class="col-md-4"><div class="form-group">{{ Form::label("imei_number", __("IMEI Number"),["class"=>"form-label"]) }}<div class="form-icon-user">{{ Form::number("imei_number_down", "", array("class" => "form-control","id"=>"imei_number_down","placeholder"=>"Enter imei number")) }}</div></div></div><div class="col-md-4 input-group-append pt-3 mt-3"><button class="btn btn-danger remove_field btn-sm" type="button"><i class="fa fa-minus"></i></button>&nbsp<button class="btn btn-success save_field btn-sm" type="button">save</button></div></div>'
         var max_fields = 2; 
         var x=1
+
         $(document).on('click','#addmore',function(e){
             $('.remove_field').off('click');
             e.preventDefault();
@@ -179,6 +189,7 @@
             var product_service_id= $("#the_product_service_id").val()
             var sale_price= $("#sale_price").val()
             var retail_price= $("#retail_price").val()
+            var color= $("#the_color").val()
             var supplier_person= $("#choices-multiple2").val()
             var delivery_person= $("#choices-multiple3").val()
             var delivery_man_id= $("#delivery_man_id_id").val()
@@ -189,10 +200,7 @@
             var serial_number_down= $("#serial_number_down").val()
             var _token=$("input[name=_token]").val()
               
-            if($("#imei_number_down").val() == ''){
-                $("#imei_number_down").css('border','1px solid red')
-
-            }else if($("#serial_number_down").val() == ''){
+             if($("#serial_number_down").val() == ''){
 
                 $("#serial_number_down").css('border','1px solid red')
 
@@ -205,6 +213,7 @@
                         product_service_id:product_service_id,
                         sale_price:sale_price,
                         retail_price: retail_price,
+                        color: color,
                         supplier_person:supplier_person,
                         delivery_person:delivery_person,
                         delivery_man_id:delivery_man_id,
