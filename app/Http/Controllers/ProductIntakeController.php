@@ -45,6 +45,27 @@ class ProductIntakeController extends Controller
 
         return response()->json($output);
     }
+
+    public function filter_product_serial_number(Request $request)
+    {
+        $select = $request->select;
+        $value = $request->value;
+        $dependent = $request->dependent;
+        $data = DB::table('product_intakes')
+        ->where($select, $value)
+            ->groupBy($dependent)
+            ->get();
+
+        $output = '<select class="select2"><option value=""> Select ' . ucfirst($dependent) . '</option></select>';
+
+        foreach ($data as $row) {
+            $output .= '<option value="' . $row->$dependent . '">' . $row->$dependent . '</option>';
+        }
+
+        return response()->json($output);
+    }
+
+    
     public function getVenderId(Request $request)
     {
         $prodc = Vender::select('id')->where('name', $request->supplier_person)->first();
@@ -53,7 +74,7 @@ class ProductIntakeController extends Controller
 
     public function getDeliveyManId(Request $request)
     {
-        $prodc = DeliveryMan::select('id')->where('contact', $request->delivery_person)->first();
+        $prodc = DeliveryMan::select('id','first_name','last_name')->where('contact', $request->delivery_person)->first();
         return response()->json($prodc);
     }
 
@@ -128,7 +149,7 @@ class ProductIntakeController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         if (\Auth::user()->can('create product & service')) {
 
             $rules = [
@@ -184,9 +205,9 @@ class ProductIntakeController extends Controller
             $productIntake->receiving_person     = $request->receiving_person;
 
             $productIntake->created_by           = \Auth::user()->creatorId();
-            $time = \Carbon\Carbon::now();
-            $dateonly = date("Y-m-d", strtotime($time));
-            $productIntake->updated_at           = $dateonly;
+            // $time = \Carbon\Carbon::now();
+            // $dateonly = date("Y-m-d", strtotime($time));
+            // $productIntake->updated_at           = $dateonly;
 
             $productIntake->save();
 
@@ -196,11 +217,6 @@ class ProductIntakeController extends Controller
 
             return redirect()->route('productintake.index')->with('success', __('Product(s) successfully saved.'));
         } else {
-            // $products = $request->all();
-
-
-            // return response()->json($products);
-
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -233,9 +249,9 @@ class ProductIntakeController extends Controller
         $Record->delivery_person = $request->delivery_person;
         $Record->receiving_person = $request->receiving_person;
         $Record->created_by      = \Auth::user()->creatorId();
-        $time = \Carbon\Carbon::now();
-        $dateonly = date("Y-m-d", strtotime($time));
-        $Record->updated_at      = $dateonly;
+        // $time = \Carbon\Carbon::now();
+        // $dateonly = date("Y-m-d", strtotime($time));
+        // $Record->updated_at      = $dateonly;
 
         $Record->save();
         if ($Record->save()) {
@@ -362,11 +378,11 @@ class ProductIntakeController extends Controller
             $productIntake->receiving_person  = $request->receiving_person;
             $productIntake->receiving_person  = \Auth::user()->name;
             $productIntake->returning_person  = $productIntake->returning_person;
-            $time = \Carbon\Carbon::now();
+            // $time = \Carbon\Carbon::now();
 
-            $dateonly = date("Y-m-d", strtotime($time));
+            // $dateonly = date("Y-m-d", strtotime($time));
             $productIntake->created_by      = \Auth::user()->creatorId();
-            $productIntake->updated_at      = $dateonly;
+            // $productIntake->updated_at      = $dateonly;
             $productIntake->save();
             CustomField::saveData($productIntake, $request->customField);
 

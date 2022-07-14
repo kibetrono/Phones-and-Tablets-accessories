@@ -128,9 +128,9 @@ class ProductStockController extends Controller
             {
                 $productService->quantity        = $total;
                 $productService->created_by     = \Auth::user()->creatorId();
-                $time = \Carbon\Carbon::now();
-                $dateonly = date("Y-m-d", strtotime($time));
-                $productService->updated_at      = $dateonly;
+                // $time = \Carbon\Carbon::now();
+                // $dateonly = date("Y-m-d", strtotime($time));
+                // $productService->updated_at      = $dateonly;
                 $productService->save();
 
                 //Product Stock Report

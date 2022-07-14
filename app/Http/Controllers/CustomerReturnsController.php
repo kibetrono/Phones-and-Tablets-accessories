@@ -46,10 +46,10 @@ class CustomerReturnsController extends Controller
     {
         if (\Auth::user()->can('create product & service')) {
             $customFields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->where('module', '=', 'product')->get();
-            // $status= 'custreturn';
+            $status= 'custreturn';
             // $product_serial_number      = ProductIntake::where('status', '!=', $status)->pluck('serial_number', 'serial_number')->toArray();
-            $product_serial_number      = ProductIntake::where('status', '!=', 'custreturn')->pluck('serial_number', 'id');
-
+            $product_serial_number      = ProductIntake::where('status', '!=', $status)->pluck('serial_number', 'id');
+            // $product_serial_number      = ProductIntake::whereIn('status', ['paid','sold'])->pluck('serial_number', 'id');
             $returning_customer         = Customer::all()->pluck('name', 'name')->toArray();
             $receiving_person           = \Auth::user()->name;
         
@@ -105,11 +105,11 @@ class CustomerReturnsController extends Controller
             CustomField::saveData($customerReturns, $request->customField);
 
             if($customerReturns->save()){
-                $time = \Carbon\Carbon::now();
+                // $time = \Carbon\Carbon::now();
 
-                $dateonly = date("Y-m-d", strtotime($time));
+                // $dateonly = date("Y-m-d", strtotime($time));
 
-           ProductIntake::where('id',$request->product_id)->update(array('status'=>'custreturn','updated_at'=> $dateonly));
+           ProductIntake::where('id',$request->product_id)->update(array('status'=>'custreturn'));
 
             };
 

@@ -150,11 +150,7 @@ class OrderController extends Controller
 
             if($order->save()){
 
-                $time = \Carbon\Carbon::now();
-
-                $dateonly = date("Y-m-d", strtotime($time));
-
-                ProductIntake::Where('imei_number',$request->imei_number)->update(array('status'=>'sold','updated_at'=> $dateonly));
+                ProductIntake::Where('imei_number',$request->imei_number)->update(array('status'=>'sold'));
 
               $prod= ProductService::Where('name', $request->model_name)->first();
         

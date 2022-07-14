@@ -131,7 +131,7 @@ class ProductReturnController extends Controller
 
             $rules = [
                 'model_name'         => 'required',
-                'imei_number'        => 'required',
+                // 'imei_number'        => 'required',
                 'serial_number'      => 'required',
                 // 'delivery_man_id' => 'required',
                 'returning_person_id' =>'required',
@@ -154,13 +154,19 @@ class ProductReturnController extends Controller
             }
 
             if ($productIntake->created_by == \Auth::user()->creatorId()) {
-                $time = \Carbon\Carbon::now();
+                // $time = \Carbon\Carbon::now();
 
-                $dateonly = date("Y-m-d", strtotime($time));
+                // $dateonly = date("Y-m-d", strtotime($time));
 
                 $productIntake->id                    = $productIntake->id;
                 $productIntake->model_name            = $request->model_name;
-                $productIntake->imei_number           = $request->imei_number;
+                if($request->imei_number == ''){
+                    $productIntake->imei_number           = null;
+
+                }else{
+                    $productIntake->imei_number           = $request->imei_number;
+
+                }
                 $productIntake->serial_number         = $productIntake->serial_number;
                 $productIntake->product_service_id    = $productIntake->product_service_id;
                 $productIntake->delivery_man_id       = $productIntake->delivery_man_id;
@@ -176,7 +182,7 @@ class ProductReturnController extends Controller
                 $productIntake->returning_person       = $request->returning_person;
                 $productIntake->receiving_person      = $request->receiving_person;
                 $productIntake->created_by            = \Auth::user()->creatorId();
-                $productIntake->updated_at            = $dateonly;
+                // $productIntake->updated_at            = $dateonly;
                 $productIntake->save();
 
 
